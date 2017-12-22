@@ -6,6 +6,7 @@
 #an integer modulo q, a signal sigma defined in the 'signal' function and a prime number q
 
 from random import *
+import numpy
 
 def robust_extractor(x, sigma, q):
     return (x + sigma*((q-1)/2)%q)%2
@@ -23,31 +24,34 @@ def signal_functions(x, b, q):
         else:
             return 1
 
-#This will generate an n x n matrix
-
-#Must revise this to make it multidimensional
+#This function makes an n x n matrix of integers mod q
 def generate_matrix_M(n, q):
 
     #Declare a matrix here:
-    M = []
-    #Build a matrix here:
-    for i in range(0, n*n):
-        M.append(randint(0,q-1))
+    M = numpy.zeros((n,n))
+
+    #Build the matrix here:
+    for i in range(0,n):
+        for j in range(0,n):
+            M[i][j] = randint(0,q-1)
     return M
 
-def print_NbyN_matrix(M, n):
-    for i in range(0, n):
-        for j in range(0, n):
-            print(M[i*n+j])
-        print("\n")
+def generate_gaussian_vector(n,q):
+    alpha = (1/float(n))**3
+    mu = 0 #page 5 of the paper
+    sigma = alpha*q
+    return numpy.random.normal(mu,sigma,n)
 
 def main():
     print("This part of the program requires you to specify the public parameters:")
     n = int(input("Dimensions of M (must be an n x n) so please enter n: "))
     q = int(input("Please enter a prime number greater than 2, this is q: "))
 
+    #M is a matrix of integers mod q and has dimensions n x n
     M = generate_matrix_M(n,q)
-    print_NbyN_matrix(M,n)
+    eA = generate_gaussian_vector(n,q)
+    sA = generate_gaussian_vector(n,q)
+    
 
 #initialisation
 if __name__ == "__main__":
