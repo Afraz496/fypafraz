@@ -1,4 +1,4 @@
-#! usr/bin/env python
+#!usr/bin/env python
 
 # Please note that where used % denotes the modulo operator
 
@@ -43,7 +43,7 @@ def print_NbyN_matrix(M, n):
 
 def main():
     print("This part of the program requires you to specify the public parameters:")
-    n = int(input("Dimensions of M (must be an n x n) so please enter n "))
+    n = int(input("Dimensions of M (must be an n x n) so please enter n: "))
     q = int(input("Please enter a prime number greater than 2, this is q: "))
 
     M = generate_matrix_M(n,q)
