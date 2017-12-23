@@ -42,16 +42,45 @@ def generate_gaussian_vector(n,q):
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n)
 
+def generate_gaussian_scalar(q):
+    alpha = 1
+    mu = 0
+    sigma = alpha*q
+    return numpy.random.normal(mu,sigma,1)
+
 def main():
     print("This part of the program requires you to specify the public parameters:")
+
+    # parameter selection, n = lambda, q = lambda ^ 4.
     n = int(input("Dimensions of M (must be an n x n) so please enter n: "))
     q = int(input("Please enter a prime number greater than 2, this is q: "))
 
     #M is a matrix of integers mod q and has dimensions n x n
     M = generate_matrix_M(n,q)
-    eA = generate_gaussian_vector(n,q)
+
+    #Alice
     sA = generate_gaussian_vector(n,q)
-    
+    eA = generate_gaussian_vector(n,q)
+
+    # numpy relies on .dot for matrix - vector multiplication
+    pA = M.dot(sA) + 2*eA%q
+
+    #Bob
+    sB = generate_gaussian_vector(n,q)
+    edashB = generate_gaussian_scalar(q)
+
+    KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
+
+    eB = generate_gaussian_vector(n,q)
+
+    pB = numpy.transpose(M).dot(sB) + 2*eB%q
+
+    signal = signal_functions(KB,0,q)
+
+    SKB = (KB,signal,q)
+
+    print(KB)
+    #Back to Alice
 
 #initialisation
 if __name__ == "__main__":
