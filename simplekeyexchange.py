@@ -38,13 +38,17 @@ def generate_matrix_M(n, q):
             M[i][j] = randint(0,q-1)
     return M
 
-def generate_gaussian_vector(n,q):
+def generate_gaussian_vector(n):
+    # parameter selection, n = lambda, q = lambda ^ 4.
+    q = n**4
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n)
 
-def generate_gaussian_scalar(q):
+def generate_gaussian_scalar():
+    # parameter selection, n = lambda, q = lambda ^ 4.
+    q = 1
     alpha = 1
     mu = 0
     sigma = alpha*q
@@ -53,7 +57,7 @@ def generate_gaussian_scalar(q):
 def main():
     print("This part of the program requires you to specify the public parameters:")
 
-    # parameter selection, n = lambda, q = lambda ^ 4.
+
     n = int(input("Dimensions of M (must be an n x n) so please enter n: "))
     q = int(input("Please enter a prime number greater than 2, this is q: "))
 
@@ -61,19 +65,19 @@ def main():
     M = generate_matrix_M(n,q)
 
     #Alice
-    sA = generate_gaussian_vector(n,q)
-    eA = generate_gaussian_vector(n,q)
+    sA = generate_gaussian_vector(n)
+    eA = generate_gaussian_vector(n)
 
     # numpy relies on .dot for matrix - vector multiplication
     pA = M.dot(sA) + 2*eA%q
 
     #Bob
-    sB = generate_gaussian_vector(n,q)
-    edashB = generate_gaussian_scalar(q)
+    sB = generate_gaussian_vector(n)
+    edashB = generate_gaussian_scalar()
 
     KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
 
-    eB = generate_gaussian_vector(n,q)
+    eB = generate_gaussian_vector(n)
 
     pB = numpy.transpose(M).dot(sB) + 2*eB%q
 
@@ -81,9 +85,14 @@ def main():
 
     SKB = robust_extractor(KB,signal,q)
 
-    print(SKB)
     #Back to Alice
+    edashA = generate_gaussian_scalar()
+    KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
+    SKA = robust_extractor(KA,signal,q)
+
+    print("SKA: " + str(SKA))
+    print("SKB: " + str(SKB))
 #initialisation
 if __name__ == "__main__":
     main()
