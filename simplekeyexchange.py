@@ -11,7 +11,7 @@ from numpy import *
 
 #NB: x is a numpy array so conversion required
 def robust_extractor(x, sigma, q):
-    return (float(x) + sigma*((q-1)/2)%q)%2
+    return int((float(x) + sigma*((q-1)/2)%q)%2)
 
 #b will determine what type of signal function you require, inputs are x as an integer mod q, q as a prime number and b (signal case)
 def signal_functions(x, b, q):
