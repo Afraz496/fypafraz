@@ -93,6 +93,9 @@ def main():
 
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
+
+    if SKA == SKB:
+        print("Alice and Bob share the same key!")
 #initialisation
 if __name__ == "__main__":
     main()
