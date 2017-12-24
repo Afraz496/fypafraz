@@ -27,6 +27,14 @@ If you do a simple `ls` it will show all the files in the repository. To use any
 
 #### Simple Key exchange
 
+Before executing the program you must at least have python 2.x in your system. The following dependency is required for generating the matrices in the program:
+
+[Numpy](http://www.numpy.org/)
+
+To install the dependency please use `pip` : 
+
+`$ python -m pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose` as seen on [this website](https://scipy.org/install.html)
+
 As referred to in the introduction section this is based on a simple key exchange with the learning with errors problem. If you followed the above steps and are in _My Implementations_ then to run the simple key exchange please type the following in terminal:
 
 `$ python simplekeyexchange.py`
