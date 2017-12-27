@@ -14,17 +14,24 @@ def robust_extractor(x, sigma, q):
     return int((int(x)%q + sigma*((q-1)/2)%q)%2)
 
 #b will determine what type of signal function you require, inputs are x as an integer mod q, q as a prime number and b (signal case)
-def signal_functions(x, b, q):
+def signal_functions(y, b, q):
     if b == 0:
-        if x > -q/4 or x < q/4:
+        if y >= -q/4 or y <= q/4:
             return 0
         else:
             return 1
     elif b == 1:
-        if x > -q/4 + 1 or x < q/4 + 1:
+        if y >= -q/4 + 1 or y <= q/4 + 1:
             return 0
         else:
             return 1
+
+def check_robust_extractor(x,y,q):
+    delta = q/4 - 2
+    if (x-y)%2 == 0 and abs(x-y) <= delta:
+        return True
+    else:
+        return False
 
 #This function makes an n x n matrix of integers mod q
 def generate_matrix_M(n, q):
@@ -54,24 +61,18 @@ def generate_gaussian_scalar():
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,1)
 
-def main():
-    print("This part of the program requires you to specify the public parameters:")
-
-
-    n = int(input("Dimensions of M (must be an n x n) so please enter n: "))
-    q = int(input("Please enter a prime number greater than 2, this is q: "))
-
+def run_key_exchange(n,q):
     #M is a matrix of integers mod q and has dimensions n x n
     M = generate_matrix_M(n,q)
 
-    #Alice
+    #----------------Alice--------------------
     sA = generate_gaussian_vector(n)
     eA = generate_gaussian_vector(n)
 
     # numpy relies on .dot for matrix - vector multiplication
     pA = M.dot(sA) + 2*eA%q
 
-    #Bob
+    #-----------------Bob---------------------
     sB = generate_gaussian_vector(n)
     edashB = generate_gaussian_scalar()
 
@@ -85,17 +86,39 @@ def main():
 
     SKB = robust_extractor(KB,signal,q)
 
-    #Back to Alice
+    #---------------Back to Alice---------------
     edashA = generate_gaussian_scalar()
     KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
     SKA = robust_extractor(KA,signal,q)
 
+    #-----------------Results-------------------
+    print("KA: " + str(KA))
+    print("KB: " + str(KB))
+
+    print("q/4: " + str(q/4))
+    print("KA/4: " + str(KA/4))
+    print("KB/4: " + str(KB/4))
+
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
 
+    if(check_robust_extractor(SKA,SKB,q)):
+        print("Robust Extractor worked")
+    else:
+        print("Robus Extractor failed")
+
     if SKA == SKB:
         print("Alice and Bob share the same key!")
+
+
+def main():
+
+    n = 100
+    q = 100000000000001.0
+
+    run_key_exchange(n,q)
+
 #initialisation
 if __name__ == "__main__":
     main()
