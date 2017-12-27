@@ -45,17 +45,15 @@ def generate_matrix_M(n, q):
             M[i][j] = randint(0,q-1)
     return M
 
-def generate_gaussian_vector(n):
+def generate_gaussian_vector(n,q):
     # parameter selection, n = lambda, q = lambda ^ 4.
-    q = n**4
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n)
 
-def generate_gaussian_scalar():
+def generate_gaussian_scalar(q):
     # parameter selection, n = lambda, q = lambda ^ 4.
-    q = 1
     alpha = 1
     mu = 0
     sigma = alpha*q
@@ -66,19 +64,19 @@ def run_key_exchange(n,q):
     M = generate_matrix_M(n,q)
 
     #----------------Alice--------------------
-    sA = generate_gaussian_vector(n)
-    eA = generate_gaussian_vector(n)
+    sA = generate_gaussian_vector(n,q)
+    eA = generate_gaussian_vector(n,q)
 
     # numpy relies on .dot for matrix - vector multiplication
     pA = M.dot(sA) + 2*eA%q
 
     #-----------------Bob---------------------
-    sB = generate_gaussian_vector(n)
-    edashB = generate_gaussian_scalar()
+    sB = generate_gaussian_vector(n,q)
+    edashB = generate_gaussian_scalar(q)
 
     KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
 
-    eB = generate_gaussian_vector(n)
+    eB = generate_gaussian_vector(n,q)
 
     pB = numpy.transpose(M).dot(sB) + 2*eB%q
 
@@ -87,7 +85,7 @@ def run_key_exchange(n,q):
     SKB = robust_extractor(KB,signal,q)
 
     #---------------Back to Alice---------------
-    edashA = generate_gaussian_scalar()
+    edashA = generate_gaussian_scalar(q)
     KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
     SKA = robust_extractor(KA,signal,q)
@@ -115,7 +113,7 @@ def run_key_exchange(n,q):
 def main():
 
     n = 100
-    q = 100000000000001.0
+    q = 100000001.0
 
     run_key_exchange(n,q)
 
