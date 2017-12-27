@@ -59,37 +59,45 @@ def generate_gaussian_scalar(q):
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,1)
 
+def generate_alice_params(M,n,q):
+    sA = generate_gaussian_vector(n,q)
+    eA = generate_gaussian_vector(n,q)
+    pA = M.dot(sA) + 2*eA%q
+    return pA,sA
+
+def generate_bob_params(M,n,q):
+    sB = generate_gaussian_vector(n,q)
+    eB = generate_gaussian_vector(n,q)
+    pB = numpy.transpose(M).dot(sB) + 2*eB%q
+    return pB,sB
+
 def run_key_exchange(n,q):
     #M is a matrix of integers mod q and has dimensions n x n
     M = generate_matrix_M(n,q)
+    pA,sA = generate_alice_params(M,n,q)
+    pB,sB = generate_bob_params(M,n,q)
 
-    #----------------Alice--------------------
-    sA = generate_gaussian_vector(n,q)
-    eA = generate_gaussian_vector(n,q)
-
-    # numpy relies on .dot for matrix - vector multiplication
-    pA = M.dot(sA) + 2*eA%q
-
-    #-----------------Bob---------------------
-    sB = generate_gaussian_vector(n,q)
     edashB = generate_gaussian_scalar(q)
-
     KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
-
-    eB = generate_gaussian_vector(n,q)
-
-    pB = numpy.transpose(M).dot(sB) + 2*eB%q
 
     signal = signal_functions(KB,0,q)
 
-    SKB = robust_extractor(KB,signal,q)
-
-    #---------------Back to Alice---------------
     edashA = generate_gaussian_scalar(q)
     KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
-    SKA = robust_extractor(KA,signal,q)
+    #---------ensuring Robust extractor property is preserved--------
+    while(not check_robust_extractor(KA,KB,q)):
+        pA,sA = generate_alice_params(M,n,q)
+        pB,sB = generate_bob_params(M,n,q)
+        edashB = generate_gaussian_scalar(q)
+        KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
+        signal = signal_functions(KB,0,q)
+        edashA = generate_gaussian_scalar(q)
+        KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
+    #---------------Generating shared keys------
+    SKA = robust_extractor(KA,signal,q)
+    SKB = robust_extractor(KB,signal,q)
     #-----------------Results-------------------
     print("KA: " + str(KA))
     print("KB: " + str(KB))
@@ -101,10 +109,10 @@ def run_key_exchange(n,q):
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
 
-    if(check_robust_extractor(SKA,SKB,q)):
+    if(check_robust_extractor(KA,KB,q)):
         print("Robust Extractor worked")
     else:
-        print("Robus Extractor failed")
+        print("Robust Extractor failed")
 
     if SKA == SKB:
         print("Alice and Bob share the same key!")
@@ -113,7 +121,7 @@ def run_key_exchange(n,q):
 def main():
 
     n = 100
-    q = 100000001.0
+    q = 1024
 
     run_key_exchange(n,q)
 
