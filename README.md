@@ -19,9 +19,11 @@ After you have git cloned the repository then enter the repository using `cd`
 
 `$ cd fypafraz`
 
-If you do a simple `ls` it will show all the files in the repository. To use any implementations I have written you must do:
+If you do a simple `ls` it will show all the files in the repository.
 
-To examine already existing implementations of PQC and how their performance has been optimised
+To examine already existing implementations of PQC and how their performance has been optimised please do: 
+
+`$ cd [IMPLEMENTATION NAME]` where the Implementation name corresponds to either `lwe-frodo` or `newhope`
 
 To make use of implementations written in this repository:
 
