@@ -1,0 +1,3 @@
+[submodule "lwe-frodo"]
+	path = lwe-frodo
+	url = https://github.com/lwe-frodo/lwe-frodo.git
