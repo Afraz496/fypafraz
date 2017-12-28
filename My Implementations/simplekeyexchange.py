@@ -8,6 +8,9 @@
 from random import *
 import numpy
 from numpy import *
+import scipy.stats as ss
+
+
 
 #NB: x is a numpy array so conversion required, x is KA or KB
 def robust_extractor(x, sigma, q):
@@ -45,29 +48,31 @@ def generate_matrix_M(n, q):
             M[i][j] = randint(0,q-1)
     return M
 
-def generate_gaussian_vector(n,q):
+def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4.
+    q = n**4
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n)
 
-def generate_gaussian_scalar(q):
+def generate_gaussian_scalar():
     # parameter selection, n = lambda, q = lambda ^ 4.
+    q = 1
     alpha = 1
     mu = 0
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,1)
 
 def generate_alice_params(M,n,q):
-    sA = generate_gaussian_vector(n,q)
-    eA = generate_gaussian_vector(n,q)
+    sA = generate_gaussian_vector(n)
+    eA = generate_gaussian_vector(n)
     pA = M.dot(sA) + 2*eA%q
     return pA,sA
 
 def generate_bob_params(M,n,q):
-    sB = generate_gaussian_vector(n,q)
-    eB = generate_gaussian_vector(n,q)
+    sB = generate_gaussian_vector(n)
+    eB = generate_gaussian_vector(n)
     pB = numpy.transpose(M).dot(sB) + 2*eB%q
     return pB,sB
 
@@ -77,23 +82,24 @@ def run_key_exchange(n,q):
     pA,sA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
-    edashA = generate_gaussian_scalar(q)
-    edashB = generate_gaussian_scalar(q)
+    edashA = generate_gaussian_scalar()
+    edashB = generate_gaussian_scalar()
 
     KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
     KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
 
     signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
+    """
     while(not check_robust_extractor(KA,KB,q)):
         pA,sA = generate_alice_params(M,n,q)
         pB,sB = generate_bob_params(M,n,q)
-        edashA = generate_gaussian_scalar(q)
-        edashB = generate_gaussian_scalar(q)
+        edashA = generate_gaussian_scalar()
+        edashB = generate_gaussian_scalar()
         KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
         KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
         signal = signal_functions(KB,0,q)
-
+    """
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
