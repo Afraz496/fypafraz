@@ -23,7 +23,7 @@ If you do a simple `ls` it will show all the files in the repository.
 
 To examine already existing implementations of PQC and how their performance has been optimised please do: 
 
-`$ cd [IMPLEMENTATION NAME]` where the Implementation name corresponds to either `lwe-frodo` or `newhope`
+`$ cd Existing\ Implementations`
 
 To make use of implementations written in this repository:
 
