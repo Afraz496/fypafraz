@@ -11,17 +11,32 @@ Current Post Quantum Cryptographic implementations:
 
 ## Usage
 
-First start by git cloning the repository to a directory you are comfortable with. To git clone please type the following in Terminal:
+First start by git cloning the repository to a directory you are comfortable with. To git clone please type the following in Terminal and to ensure that the submodules are in this repository:
 
-`$ git clone https://github.com/Afrazinator/fypafraz.git`
+`$ git --recurse-submodules clone https://github.com/Afrazinator/fypafraz.git`
 
 After you have git cloned the repository then enter the repository using `cd`
 
 `$ cd fypafraz`
 
-If you do a simple `ls` it will show all the files in the repository. To use any implementations I have written you must do:
+If you do a simple `ls` it will show all the files in the repository.
+
+To examine already existing implementations of PQC and how their performance has been optimised please do: 
+
+`$ cd [IMPLEMENTATION NAME]` where the Implementation name corresponds to either `lwe-frodo` or `newhope`
+
+To make use of implementations written in this repository:
 
 `$ cd My\ Implementations/` NB: This is easier with Tab Completion in terminal
+
+### Existing Implementationa
+
+There are 2 existing implementations and one of the focuses of this repo involves modifying them to improve their current performance. The 2 implementations are:
+
+- [Frodo](https://github.com/lwe-frodo/lwe-frodo)
+- [NewHope](https://github.com/tpoeppelmann/newhope)
+
+Further examinations on how these 2 pieces of software will be optimised will be found in the submodules in this repository. 
 
 ### My Implementations
 
