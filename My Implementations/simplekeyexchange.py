@@ -77,23 +77,22 @@ def run_key_exchange(n,q):
     pA,sA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
+    edashA = generate_gaussian_scalar(q)
     edashB = generate_gaussian_scalar(q)
+
+    KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
     KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
 
     signal = signal_functions(KB,0,q)
-
-    edashA = generate_gaussian_scalar(q)
-    KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
-
     #---------ensuring Robust extractor property is preserved--------
     while(not check_robust_extractor(KA,KB,q)):
         pA,sA = generate_alice_params(M,n,q)
         pB,sB = generate_bob_params(M,n,q)
+        edashA = generate_gaussian_scalar(q)
         edashB = generate_gaussian_scalar(q)
+        KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
         KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
         signal = signal_functions(KB,0,q)
-        edashA = generate_gaussian_scalar(q)
-        KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
 
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
