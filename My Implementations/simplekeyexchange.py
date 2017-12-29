@@ -49,12 +49,12 @@ def generate_matrix_M(n, q):
     return M
 
 def generate_gaussian_vector(n):
-    # parameter selection, n = lambda, q = lambda ^ 4.
+    # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
     q = n**4
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
-    return numpy.random.normal(mu,sigma,n)
+    return numpy.random.normal(mu,sigma,n).astype(int)
 
 def generate_gaussian_scalar():
     # parameter selection, n = lambda, q = lambda ^ 4.
@@ -62,7 +62,7 @@ def generate_gaussian_scalar():
     alpha = 1
     mu = 0
     sigma = alpha*q
-    return numpy.random.normal(mu,sigma,1)
+    return numpy.random.normal(mu,sigma,1).astype(int)
 
 def generate_alice_params(M,n,q):
     sA = generate_gaussian_vector(n)
@@ -90,7 +90,7 @@ def run_key_exchange(n,q):
 
     signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
-    """
+
     while(not check_robust_extractor(KA,KB,q)):
         pA,sA = generate_alice_params(M,n,q)
         pB,sB = generate_bob_params(M,n,q)
@@ -99,7 +99,7 @@ def run_key_exchange(n,q):
         KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
         KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
         signal = signal_functions(KB,0,q)
-    """
+    
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
