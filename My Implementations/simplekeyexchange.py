@@ -8,13 +8,13 @@
 from random import *
 import numpy
 from numpy import *
-import scipy.stats as ss
-
 
 
 #NB: x is a numpy array so conversion required, x is KA or KB
+
+#This function must return either a 0 or a 1
 def robust_extractor(x, sigma, q):
-    return int((int(x)%q + sigma*((q-1)/2)%q)%2)
+    return int((int(x)%q + sigma*((q-1)/2)%q)%2) #---> Because of the mod 2 operation
 
 #b will determine what type of signal function you require, inputs are x as an integer mod q, q as a prime number and b (signal case)
 def signal_functions(y, b, q):
@@ -67,13 +67,13 @@ def generate_gaussian_scalar():
 def generate_alice_params(M,n,q):
     sA = generate_gaussian_vector(n)
     eA = generate_gaussian_vector(n)
-    pA = M.dot(sA) + 2*eA%q
+    pA = (M.dot(sA) + 2*eA)%q
     return pA,sA
 
 def generate_bob_params(M,n,q):
     sB = generate_gaussian_vector(n)
     eB = generate_gaussian_vector(n)
-    pB = numpy.transpose(M).dot(sB) + 2*eB%q
+    pB = (numpy.transpose(M).dot(sB) + 2*eB)%q
     return pB,sB
 
 def run_key_exchange(n,q):
@@ -85,8 +85,8 @@ def run_key_exchange(n,q):
     edashA = generate_gaussian_scalar()
     edashB = generate_gaussian_scalar()
 
-    KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
-    KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
+    KA = (numpy.transpose(sA).dot(pB) + 2*edashA)%q
+    KB = (numpy.transpose(pA).dot(sB) + 2*edashB)%q
 
     signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
@@ -96,10 +96,10 @@ def run_key_exchange(n,q):
         pB,sB = generate_bob_params(M,n,q)
         edashA = generate_gaussian_scalar()
         edashB = generate_gaussian_scalar()
-        KA = numpy.transpose(sA).dot(pB) + 2*edashA%q
-        KB = numpy.transpose(pA).dot(sB) + 2*edashB%q
+        KA = (numpy.transpose(sA).dot(pB) + 2*edashA)%q
+        KB = (numpy.transpose(pA).dot(sB) + 2*edashB)%q
         signal = signal_functions(KB,0,q)
-    
+
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
@@ -126,7 +126,7 @@ def run_key_exchange(n,q):
 def main():
 
     n = 100
-    q = 1024
+    q = n**4
 
     run_key_exchange(n,q)
 
