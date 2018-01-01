@@ -104,12 +104,6 @@ def run_key_exchange(n,q):
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
     #-----------------Results-------------------
-    print("KA: " + str(KA))
-    print("KB: " + str(KB))
-
-    print("q/4: " + str(q/4))
-    print("KA/4: " + str(KA/4))
-    print("KB/4: " + str(KB/4))
 
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
