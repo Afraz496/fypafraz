@@ -9,7 +9,6 @@ from random import *
 import numpy
 from numpy import *
 
-
 #NB: x is a numpy array so conversion required, x is KA or KB
 
 #This function must return either a 0 or a 1
@@ -91,6 +90,7 @@ def run_key_exchange(n,q):
     signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
 
+    #Keep on generating the parameters until robust extractor condition 3 is preserved
     while(not check_robust_extractor(KA,KB,q)):
         pA,sA = generate_alice_params(M,n,q)
         pB,sB = generate_bob_params(M,n,q)
@@ -103,8 +103,8 @@ def run_key_exchange(n,q):
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
-    #-----------------Results-------------------
 
+    #-----------------Results-------------------
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
 
@@ -119,6 +119,7 @@ def run_key_exchange(n,q):
 
 def main():
 
+    #Change the parameters here:
     n = 100
     q = n**4
 
