@@ -29,14 +29,14 @@ To make use of implementations written in this repository:
 
 `$ cd My\ Implementations/` NB: This is easier with Tab Completion in terminal
 
-### Existing Implementationa
+### Existing Implementations
 
 There are 2 existing implementations and one of the focuses of this repo involves modifying them to improve their current performance. The 2 implementations are:
 
 - [Frodo](https://github.com/lwe-frodo/lwe-frodo)
 - [NewHope](https://github.com/tpoeppelmann/newhope)
 
-Further examinations on how these 2 pieces of software will be optimised will be found in the submodules in this repository. 
+Further examinations on how these 2 pieces of software will be optimised will be found in the existing implementations folder in this repository. The submodules are attached with their commit hash (at the time) for guaranteeing a baseline from the modified version of the code.
 
 ### My Implementations
 
