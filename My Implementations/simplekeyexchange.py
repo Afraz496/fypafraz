@@ -121,7 +121,7 @@ def main():
 
     #Change the parameters here:
     n = 100
-    q = n**4
+    q = 29
 
     run_key_exchange(n,q)
 
