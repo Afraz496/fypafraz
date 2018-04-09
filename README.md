@@ -9,6 +9,30 @@ Current Post Quantum Cryptographic implementations:
 
 - A Simple Provably Secure Key Exchange Scheme Based on the Learning with Errors Problem which can be found [here](https://eprint.iacr.org/2012/688)
 
+## Dependencies
+
+Before running any of the software available on this repository you must install python 2 on your platform. To install python 2 [here](https://www.python.org/downloads/) is the official python distribution for all platforms. 
+
+Since the implementations given in this repository make use of TLS/SSL it is important to have the library in its default configuration installed on your platform. There will also be some utilisation of TLS and SSL in the command line to run the program with adjustable parameters but the exact syntax of running SSL/TLS is not necessary and as a result will not require you to familiarise yourself with all of the SSL commands.
+
+### SSL for Python
+
+To install SSL type the following command in terminal:
+
+`$ pip install ssl`
+
+### OpenSSL for the command line
+
+#### Linux
+
+`$ sudo apt-get install openssl`
+
+#### Mac OS X
+
+To install packages in the command line of MAC OS X it is important to have [brew](https://brew.sh/) installed. 
+
+`$ brew instal openssl`
+
 ## Usage
 
 First start by git cloning the repository to a directory you are comfortable with. To git clone please type the following in Terminal and to ensure that the submodules are in this repository:
