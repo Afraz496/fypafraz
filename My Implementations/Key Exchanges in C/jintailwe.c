@@ -3,8 +3,7 @@
  *
  *
  * Based on the paper:
- *     Jintai Ding,
- *         Eprint http://eprint.iacr.org/2016/659
+ *     Jintai Ding, Xiang Xie and Xiaodong Ling
  *
  * Copyright (c) Jintai Ding, Xiang Xie and Xiaodong Ling for the theoretical key exchange
  *               Afraz Arif Khan for implementing the key exchange in C and TLS
@@ -48,23 +47,6 @@ void run_key_exchange(){
     }
     pA[i] = pA[i]%MODULO_Q;
   }
-
-  /*
-  printf("pA: \n");
-  for(i = 0; i < LATTICE_DIMENSION; i++){
-    printf("%i\n", pA[i]);
-  }
-
-  printf("sA: \n");
-  for(i = 0; i < LATTICE_DIMENSION; i++){
-    printf("%i\n", sA[i]);
-  }
-
-  printf("eA: \n");
-  for(i = 0; i < LATTICE_DIMENSION; i++){
-    printf("%i\n", eA[i]);
-  }
-  */
   //------- Generate Bobs parameters ----------
   int *sB = generate_gaussian_vector();
   int *eB = generate_gaussian_vector();

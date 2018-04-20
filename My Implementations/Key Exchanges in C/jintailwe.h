@@ -3,8 +3,7 @@
  *
  *
  * Based on the paper:
- *     Jintai Ding,
- *         Eprint http://eprint.iacr.org/2016/659
+ *     Jintai Ding, Xiang Xie and Xiaodong Ling
  *
  * Copyright (c) Jintai Ding, Xiang Xie and Xiaodong Ling for the theoretical key exchange
  *               Afraz Arif Khan for implementing the key exchange in C and TLS

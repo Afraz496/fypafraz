@@ -1,5 +1,5 @@
 # for Linux
-OPENSSL_DIR=/usr
+#OPENSSL_DIR=/usr
 # for Mac OS X with brew
 OPENSSL_DIR=/usr/local/opt/openssl
 
