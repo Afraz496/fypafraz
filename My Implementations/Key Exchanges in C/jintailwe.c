@@ -25,6 +25,7 @@
 
 /*-----------------------------Global Variables-------------------------------*/
 int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
+int M_TRANSPOSE[LATTICE_DIMENSION][LATTICE_DIMENSION]; //M transpose
 
 int main(){
   run_key_exchange();
@@ -43,7 +44,7 @@ void run_key_exchange(){
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
+      pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
     }
     pA[i] = pA[i]%MODULO_Q;
   }
@@ -54,7 +55,7 @@ void run_key_exchange(){
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      pB[i] = pB[i] + (M[i][j]*sB[j] + 2*eB[j]);
+      pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
     }
     pB[i] = pB[i]%MODULO_Q;
   }
@@ -138,6 +139,7 @@ void generate_M(){
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       M[i][j] = rand()%MODULO_Q;
+      M_TRANSPOSE[j][i] = M[i][j];
     }
   }
 }
