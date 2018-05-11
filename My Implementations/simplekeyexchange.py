@@ -47,6 +47,18 @@ def generate_matrix_M(n, q):
             M[i][j] = randint(0,q-1)
     return M
 
+def generate_gaussian_matrix(n):
+    gaussian_matrix = numpy.zeros((n,n))
+    # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
+    q = n**4
+    alpha = (1/float(n))**3
+    mu = 0 #page 5 of the paper
+    sigma = alpha*q
+    for i in range(0, n):
+        for j in range(0, n):
+            gaussian_matrix[i][j] = numpy.random.normal(mu,sigma,1).astype(int)
+    return gaussian_matrix
+
 def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
     q = n**4
@@ -55,19 +67,19 @@ def generate_gaussian_vector(n):
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n).astype(int)
 
-def generate_gaussian_scalar():
+def generate_gaussian_scalar(n):
     # parameter selection, n = lambda, q = lambda ^ 4.
-    q = 1
-    alpha = 1
+    q = n**4
+    alpha = (1/float(n))**3
     mu = 0
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,1).astype(int)
 
 def generate_alice_params(M,n,q):
-    sA = generate_gaussian_vector(n)
-    eA = generate_gaussian_vector(n)
-    pA = (M.dot(sA) + 2*eA)%q
-    return pA,sA
+    SA = generate_gaussian_matrix(n)
+    EA = generate_gaussian_matrix(n)
+    PA = (M.dot(SA) + 2*EA)%q
+    return PA,SA
 
 def generate_bob_params(M,n,q):
     sB = generate_gaussian_vector(n)
@@ -75,40 +87,53 @@ def generate_bob_params(M,n,q):
     pB = (numpy.transpose(M).dot(sB) + 2*eB)%q
     return pB,sB
 
+def generate_signal(n, KB, q):
+    signal = []
+    for i in range(0, n):
+        signal.append(signal_functions(KB[i],0,q))
+    return signal
+
 def run_key_exchange(n,q):
     #M is a matrix of integers mod q and has dimensions n x n
     M = generate_matrix_M(n,q)
-    pA,sA = generate_alice_params(M,n,q)
+    KA = numpy.zeros((n, 1))
+    KB = numpy.zeros((n, 1))
+    for i in range(0, n):
+        for j in range(0, n)
+    PA,SA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
-    edashA = generate_gaussian_scalar()
-    edashB = generate_gaussian_scalar()
+    edashA = generate_gaussian_vector(n)
+    edashB = generate_gaussian_vector(n)
 
-    KA = (numpy.transpose(sA).dot(pB) + 2*edashA)%q
-    KB = (numpy.transpose(pA).dot(sB) + 2*edashB)%q
+    KA = (numpy.transpose(SA).dot(pB) + 2*edashA)%q
+    KB = (numpy.transpose(PA).dot(sB) + 2*edashB)%q
 
-    signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
 
+    i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
-    while(not check_robust_extractor(KA,KB,q)):
-        pA,sA = generate_alice_params(M,n,q)
-        pB,sB = generate_bob_params(M,n,q)
-        edashA = generate_gaussian_scalar()
-        edashB = generate_gaussian_scalar()
-        KA = (numpy.transpose(sA).dot(pB) + 2*edashA)%q
-        KB = (numpy.transpose(pA).dot(sB) + 2*edashB)%q
-        signal = signal_functions(KB,0,q)
+    while(i < n):
+        if(not check_robust_extractor(KA[i], KB[i], q)):
+            """
+            code here
+            """
 
+        else:
+            i += 1
+    signal = generate_signal(n, KB, q)
     #---------------Generating shared keys------
-    SKA = robust_extractor(KA,signal,q)
-    SKB = robust_extractor(KB,signal,q)
+    SKA = []
+    SKB = []
+    for i in range(0, n):
+        SKA.append(robust_extractor(KA[i],signal[i],q))
+        SKB.append(robust_extractor(KB[i],signal[i],q))
 
     #-----------------Results-------------------
     print("SKA: " + str(SKA))
     print("SKB: " + str(SKB))
 
-    if(check_robust_extractor(KA,KB,q)):
+    if(check_robust_extractor(KA.all(),KB.all(),q)):
         print("Robust Extractor worked")
     else:
         print("Robust Extractor failed")
@@ -121,7 +146,7 @@ def main():
 
     #Change the parameters here:
     n = 100
-    q = n**4
+    q = 29
 
     run_key_exchange(n,q)
 
