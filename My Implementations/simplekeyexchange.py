@@ -47,6 +47,17 @@ def generate_matrix_M(n, q):
             M[i][j] = randint(0,q-1)
     return M
 
+def generate_gaussian_matrix(n):
+    gaussian_matrix = numpy.zeros((n,n))
+    # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
+    q = n**4
+    alpha = (1/float(n))**3
+    mu = 0 #page 5 of the paper
+    sigma = alpha*q
+    for i in range(0, n):
+        for j in range(0, n):
+            gaussian_matrix[i][j] = numpy.random.normal(mu,sigma,n).astype(int)
+
 def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
     q = n**4
