@@ -67,10 +67,10 @@ def generate_gaussian_vector(n):
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,n).astype(int)
 
-def generate_gaussian_scalar(n):
+def generate_gaussian_scalar():
     # parameter selection, n = lambda, q = lambda ^ 4.
-    q = n**4
-    alpha = (1/float(n))**3
+    q = 1
+    alpha = 1
     mu = 0
     sigma = alpha*q
     return numpy.random.normal(mu,sigma,1).astype(int)
@@ -80,6 +80,12 @@ def generate_alice_params(M,n,q):
     EA = generate_gaussian_matrix(n)
     PA = (M.dot(SA) + 2*EA)%q
     return PA,SA
+
+def generate_single_alice_params(M,n,q):
+    sA = generate_gaussian_vector(n)
+    eA = generate_gaussian_vector(n)
+    pA = (M.dot(sA) + 2*eA)%q
+    return pA, sA
 
 def generate_bob_params(M,n,q):
     sB = generate_gaussian_vector(n)
@@ -98,8 +104,6 @@ def run_key_exchange(n,q):
     M = generate_matrix_M(n,q)
     KA = numpy.zeros((n, 1))
     KB = numpy.zeros((n, 1))
-    for i in range(0, n):
-        for j in range(0, n)
     PA,SA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
@@ -115,9 +119,16 @@ def run_key_exchange(n,q):
     #Keep on generating the parameters until robust extractor condition 3 is preserved
     while(i < n):
         if(not check_robust_extractor(KA[i], KB[i], q)):
-            """
-            code here
-            """
+            #Redo single params
+            pA,sA = generate_single_alice_params(M,n,q)
+            pB,sB = generate_bob_params(M,n,q)
+            edash_single_A = generate_gaussian_scalar()
+            edash_single_B = generate_gaussian_scalar()
+
+            #Get KA[i]
+            KA[i] = (numpy.transpose(sA).dot(pB) + 2*edash_single_A)%q
+
+            KB[i] = (numpy.transpose(pA).dot(sB) + 2*edash_single_B)%q
 
         else:
             i += 1
@@ -145,8 +156,8 @@ def run_key_exchange(n,q):
 def main():
 
     #Change the parameters here:
-    n = 100
-    q = 29
+    n = 1024
+    q = 2**32 + 1
 
     run_key_exchange(n,q)
 
