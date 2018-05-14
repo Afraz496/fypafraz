@@ -18,12 +18,12 @@ def robust_extractor(x, sigma, q):
 #b will determine what type of signal function you require, inputs are x as an integer mod q, q as a prime number and b (signal case)
 def signal_functions(y, b, q):
     if b == 0:
-        if y >= -q/4 or y <= q/4:
+        if y >= -q/4 and y <= q/4:
             return 0
         else:
             return 1
     elif b == 1:
-        if y >= -q/4 + 1 or y <= q/4 + 1:
+        if y >= -q/4 + 1 and y <= q/4 + 1:
             return 0
         else:
             return 1
@@ -104,6 +104,8 @@ def run_key_exchange(n,q):
     M = generate_matrix_M(n,q)
     KA = numpy.zeros((n, 1))
     KB = numpy.zeros((n, 1))
+
+
     PA,SA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
@@ -156,7 +158,7 @@ def run_key_exchange(n,q):
 def main():
 
     #Change the parameters here:
-    n = 1024
+    n = 1000
     q = 2**32 + 1
 
     run_key_exchange(n,q)
