@@ -143,22 +143,22 @@ def run_key_exchange(n,q):
         SKB.append(robust_extractor(KB[i],signal[i],q))
 
     #-----------------Results-------------------
-    print("SKA: " + str(SKA))
-    print("SKB: " + str(SKB))
-
-    if(check_robust_extractor(KA.all(),KB.all(),q)):
-        print("Robust Extractor worked")
-    else:
-        print("Robust Extractor failed")
-
     if SKA == SKB:
         print("Alice and Bob share the same key!")
 
+    SKA = ''.join(map(str, SKA))
+    SKB = ''.join(map(str, SKB))
+    SKA = int(SKA)
+    SKB = int(SKB)
+    print("Alices Shared Key is:")
+    print format(SKA, 'x')
+    print("Bobs Shared Key is:")
+    print format(SKB, 'x')
 
 def main():
 
     #Change the parameters here:
-    n = 1000
+    n = 700
     q = 2**32 + 1
 
     run_key_exchange(n,q)
