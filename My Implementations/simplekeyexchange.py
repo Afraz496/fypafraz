@@ -44,7 +44,7 @@ def generate_matrix_M(n, q):
     #Build the matrix here:
     for i in range(0,n):
         for j in range(0,n):
-            M[i][j] = randint(0,q-1)
+            M[i][j] = randint(0,q)
     return M
 
 def generate_gaussian_matrix(n):
@@ -54,10 +54,7 @@ def generate_gaussian_matrix(n):
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
-    for i in range(0, n):
-        for j in range(0, n):
-            gaussian_matrix[i][j] = numpy.random.normal(mu,sigma,1).astype(int)
-    return gaussian_matrix
+    return numpy.random.normal(mu,sigma,size=(n,n)).astype(int)
 
 def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
@@ -119,6 +116,7 @@ def run_key_exchange(n,q):
 
     i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
+
     while(i < n):
         if(not check_robust_extractor(KA[i], KB[i], q)):
             #Redo single params
@@ -158,8 +156,8 @@ def run_key_exchange(n,q):
 def main():
 
     #Change the parameters here:
-    n = 700
-    q = 2**32 + 1
+    n = 752
+    q = 999983
 
     run_key_exchange(n,q)
 
