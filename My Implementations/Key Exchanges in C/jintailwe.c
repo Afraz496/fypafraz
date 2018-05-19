@@ -103,8 +103,6 @@ void run_key_exchange(){
     edashA = generate_gaussian_scalar();
     edashB = generate_gaussian_scalar();
 
-    //TODO: KA and KB are negative, revise logic
-
     //Find Alices Key
     KA = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
@@ -214,6 +212,7 @@ int signal_function(int y, int b){
       return 1;
     }
   }
+  return -1;
 }
 
 /*------------------- Generate Gaussian numbers in C -------------------------*/
