@@ -37,15 +37,7 @@ def check_robust_extractor(x,y,q):
 
 #This function makes an n x n matrix of integers mod q
 def generate_matrix_M(n, q):
-
-    #Declare a matrix here:
-    M = numpy.zeros((n,n))
-
-    #Build the matrix here:
-    for i in range(0,n):
-        for j in range(0,n):
-            M[i][j] = randint(0,q-1)
-    return M
+    return numpy.random.randint(q, size=(n,n))
 
 def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
