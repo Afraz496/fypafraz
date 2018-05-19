@@ -46,7 +46,12 @@ void run_key_exchange(){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
     }
-    pA[i] = pA[i]%MODULO_Q;
+    if(pA[i] < 0){
+      pA[i] = pA[i]%MODULO_Q + MODULO_Q;
+    }
+    else{
+      pA[i] = pA[i]%MODULO_Q;
+    }
   }
   //------- Generate Bobs parameters ----------
   int *sB = generate_gaussian_vector();
@@ -57,7 +62,12 @@ void run_key_exchange(){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
     }
-    pB[i] = pB[i]%MODULO_Q;
+    if(pB[i] < 0){
+      pB[i] = pB[i]%MODULO_Q + MODULO_Q;
+    }
+    else{
+      pB[i] = pB[i]%MODULO_Q;
+    }
   }
 
   int edashA = generate_gaussian_scalar();
@@ -116,11 +126,10 @@ void run_key_exchange(){
       KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
     }
 
-
-
   }
   //Obtain a signal
   int sig = signal_function(KB, 0);
+
   //-- Obtain shared keys between Alice and Bob ----
   int SKA = robust_extractor(KA, sig);
   int SKB = robust_extractor(KB, sig);
@@ -196,6 +205,7 @@ bool check_robust_extractor(int x, int y){
 }
 
 int signal_function(int y, int b){
+  printf("The value of b is %i\n", b);
   if(b == 0){
     if(y >= (double)-MODULO_Q/4 && y <= (double)MODULO_Q/4){
       return 0;

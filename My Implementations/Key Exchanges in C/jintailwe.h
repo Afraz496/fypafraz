@@ -19,8 +19,8 @@
 
 #ifndef HEADER_JINTAILWE_H
 
-#define LATTICE_DIMENSION 10 // Matrix Dimension
-#define MODULO_Q 29 // q - The modulo factor
+#define LATTICE_DIMENSION 512 // Matrix Dimension
+#define MODULO_Q 2147483647 // q - The modulo factor
 
 /*------------------------------Function Prototypes---------------------------*/
 void run_key_exchange(); //Running the key exchange protocol based on public params
