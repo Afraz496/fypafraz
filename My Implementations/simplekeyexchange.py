@@ -18,12 +18,12 @@ def robust_extractor(x, sigma, q):
 #b will determine what type of signal function you require, inputs are x as an integer mod q, q as a prime number and b (signal case)
 def signal_functions(y, b, q):
     if b == 0:
-        if y >= -q/4 or y <= q/4:
+        if y >= -q/4 and y <= q/4:
             return 0
         else:
             return 1
     elif b == 1:
-        if y >= -q/4 + 1 or y <= q/4 + 1:
+        if y >= -q/4 + 1 and y <= q/4 + 1:
             return 0
         else:
             return 1
@@ -37,15 +37,7 @@ def check_robust_extractor(x,y,q):
 
 #This function makes an n x n matrix of integers mod q
 def generate_matrix_M(n, q):
-
-    #Declare a matrix here:
-    M = numpy.zeros((n,n))
-
-    #Build the matrix here:
-    for i in range(0,n):
-        for j in range(0,n):
-            M[i][j] = randint(0,q-1)
-    return M
+    return numpy.random.randint(q, size=(n,n))
 
 def generate_gaussian_matrix(n):
     gaussian_matrix = numpy.zeros((n,n))
@@ -54,10 +46,7 @@ def generate_gaussian_matrix(n):
     alpha = (1/float(n))**3
     mu = 0 #page 5 of the paper
     sigma = alpha*q
-    for i in range(0, n):
-        for j in range(0, n):
-            gaussian_matrix[i][j] = numpy.random.normal(mu,sigma,1).astype(int)
-    return gaussian_matrix
+    return numpy.random.normal(mu,sigma,size=(n,n)).astype(int)
 
 def generate_gaussian_vector(n):
     # parameter selection, n = lambda, q = lambda ^ 4, alpha = (lambda)^(-3)
@@ -104,6 +93,8 @@ def run_key_exchange(n,q):
     M = generate_matrix_M(n,q)
     KA = numpy.zeros((n, 1))
     KB = numpy.zeros((n, 1))
+
+
     PA,SA = generate_alice_params(M,n,q)
     pB,sB = generate_bob_params(M,n,q)
 
@@ -117,6 +108,7 @@ def run_key_exchange(n,q):
 
     i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
+
     while(i < n):
         if(not check_robust_extractor(KA[i], KB[i], q)):
             #Redo single params
@@ -132,6 +124,7 @@ def run_key_exchange(n,q):
 
         else:
             i += 1
+
     signal = generate_signal(n, KB, q)
     #---------------Generating shared keys------
     SKA = []
@@ -141,23 +134,25 @@ def run_key_exchange(n,q):
         SKB.append(robust_extractor(KB[i],signal[i],q))
 
     #-----------------Results-------------------
-    print("SKA: " + str(SKA))
-    print("SKB: " + str(SKB))
-
-    if(check_robust_extractor(KA.all(),KB.all(),q)):
-        print("Robust Extractor worked")
-    else:
-        print("Robust Extractor failed")
-
     if SKA == SKB:
         print("Alice and Bob share the same key!")
+
+
+    SKA = ''.join(map(str, SKA))
+    SKB = ''.join(map(str, SKB))
+    SKA = int(SKA)
+    SKB = int(SKB)
+    print("Alices Shared Key is:")
+    print format(SKA, 'x')
+    print("Bobs Shared Key is:")
+    print format(SKB, 'x')
 
 
 def main():
 
     #Change the parameters here:
-    n = 1024
-    q = 2**32 + 1
+    n = 512
+    q = 2**32 - 1
 
     run_key_exchange(n,q)
 
