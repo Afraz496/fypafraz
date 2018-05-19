@@ -67,18 +67,16 @@ void run_key_exchange(){
 
   int KA = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KA = KA + (sA[i]*pB[i] + 2*edashA)%MODULO_Q;
+    KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
   }
 
   //Find Bobs Key
 
   int KB = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KB = KB + (pA[i]*sB[i] + 2*edashB)%MODULO_Q;
+    KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
   }
 
-  //Obtain a signal
-  int sig = signal_function(KB, 0);
   //-- Check the robust extractor condition till correct params generated ----
 
   while(!check_robust_extractor(KA,KB)){
@@ -87,7 +85,7 @@ void run_key_exchange(){
 
     for(i = 0; i < LATTICE_DIMENSION;i++){
       for(j = 0; j < LATTICE_DIMENSION; j++){
-        pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
+        pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
       }
       pA[i] = pA[i]%MODULO_Q;
     }
@@ -97,7 +95,7 @@ void run_key_exchange(){
 
     for(i = 0; i < LATTICE_DIMENSION;i++){
       for(j = 0; j < LATTICE_DIMENSION; j++){
-        pB[i] = pB[i] + (M[i][j]*sB[j] + 2*eB[j]);
+        pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
       }
       pB[i] = pB[i]%MODULO_Q;
     }
@@ -105,29 +103,34 @@ void run_key_exchange(){
     edashA = generate_gaussian_scalar();
     edashB = generate_gaussian_scalar();
 
+    //TODO: KA and KB are negative, revise logic
+
     //Find Alices Key
     KA = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KA = KA + (sA[i]*pB[i] + 2*edashA)%MODULO_Q;
+      KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
     }
 
 
     //Find Bobs Key
     KB = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KB = KB + (pA[i]*sB[i] + 2*edashB)%MODULO_Q;
+      KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
     }
 
-    //Obtain a signal
-    sig = signal_function(KB, 0);
-  }
 
+
+  }
+  //Obtain a signal
+  int sig = signal_function(KB, 0);
   //-- Obtain shared keys between Alice and Bob ----
   int SKA = robust_extractor(KA, sig);
   int SKB = robust_extractor(KB, sig);
 
   //--- Check if the keys are the same ---
   if(SKA == SKB){
+    printf("SKA: %i\n", SKA);
+    printf("SKB: %i\n", SKB);
     printf("SKA and SKB match!\n");
   }
 }
@@ -196,7 +199,7 @@ bool check_robust_extractor(int x, int y){
 
 int signal_function(int y, int b){
   if(b == 0){
-    if(y >= -MODULO_Q/4 || y <= MODULO_Q/4){
+    if(y >= (double)-MODULO_Q/4 && y <= (double)MODULO_Q/4){
       return 0;
     }
     else{
@@ -204,14 +207,13 @@ int signal_function(int y, int b){
     }
   }
   else if(b == 1){
-    if(y >= -MODULO_Q/4 + 1 || y <= MODULO_Q/4 + 1){
+    if(y >= (double)-MODULO_Q/4 + 1 && y <= (double)MODULO_Q/4 + 1){
       return 0;
     }
     else{
       return 1;
     }
   }
-  return -1;
 }
 
 /*------------------- Generate Gaussian numbers in C -------------------------*/
