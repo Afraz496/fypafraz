@@ -90,6 +90,7 @@ def run_key_exchange(n,q):
     signal = signal_functions(KB,0,q)
     #---------ensuring Robust extractor property is preserved--------
 
+    """
     #Keep on generating the parameters until robust extractor condition 3 is preserved
     while(not check_robust_extractor(KA,KB,q)):
         pA,sA = generate_alice_params(M,n,q)
@@ -99,7 +100,7 @@ def run_key_exchange(n,q):
         KA = (numpy.transpose(sA).dot(pB) + 2*edashA)%q
         KB = (numpy.transpose(pA).dot(sB) + 2*edashB)%q
         signal = signal_functions(KB,0,q)
-
+    """
     #---------------Generating shared keys------
     SKA = robust_extractor(KA,signal,q)
     SKB = robust_extractor(KB,signal,q)
@@ -120,8 +121,8 @@ def run_key_exchange(n,q):
 def main():
 
     #Change the parameters here:
-    n = 100
-    q = 29
+    n = 1024
+    q = 2**32 - 1
 
     run_key_exchange(n,q)
 
