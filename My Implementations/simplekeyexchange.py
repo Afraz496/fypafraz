@@ -37,15 +37,7 @@ def check_robust_extractor(x,y,q):
 
 #This function makes an n x n matrix of integers mod q
 def generate_matrix_M(n, q):
-
-    #Declare a matrix here:
-    M = numpy.zeros((n,n))
-
-    #Build the matrix here:
-    for i in range(0,n):
-        for j in range(0,n):
-            M[i][j] = randint(0,q)
-    return M
+    return numpy.random.randint(q, size=(n,n))
 
 def generate_gaussian_matrix(n):
     gaussian_matrix = numpy.zeros((n,n))
@@ -132,6 +124,7 @@ def run_key_exchange(n,q):
 
         else:
             i += 1
+
     signal = generate_signal(n, KB, q)
     #---------------Generating shared keys------
     SKA = []
@@ -144,6 +137,7 @@ def run_key_exchange(n,q):
     if SKA == SKB:
         print("Alice and Bob share the same key!")
 
+
     SKA = ''.join(map(str, SKA))
     SKB = ''.join(map(str, SKB))
     SKA = int(SKA)
@@ -153,11 +147,12 @@ def run_key_exchange(n,q):
     print("Bobs Shared Key is:")
     print format(SKB, 'x')
 
+
 def main():
 
     #Change the parameters here:
-    n = 752
-    q = 999983
+    n = 512
+    q = 2**32 - 1
 
     run_key_exchange(n,q)
 
