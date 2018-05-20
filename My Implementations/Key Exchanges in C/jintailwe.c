@@ -44,7 +44,7 @@ void run_key_exchange(){
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
+      pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
     }
     if(pA[i] < 0){
       pA[i] = pA[i]%MODULO_Q + MODULO_Q;
@@ -207,7 +207,8 @@ bool check_robust_extractor(int x, int y){
 int signal_function(int y, int b){
   printf("The value of b is %i\n", b);
   if(b == 0){
-    if(y >= (double)-MODULO_Q/4 && y <= (double)MODULO_Q/4){
+    printf("KB is %i\n", y);
+    if(y >= -MODULO_Q/4 && y <= MODULO_Q/4){
       return 0;
     }
     else{
@@ -215,7 +216,7 @@ int signal_function(int y, int b){
     }
   }
   else if(b == 1){
-    if(y >= (double)-MODULO_Q/4 + 1 && y <= (double)MODULO_Q/4 + 1){
+    if(y >= -MODULO_Q/4 + 1 && y <= MODULO_Q/4 + 1){
       return 0;
     }
     else{

@@ -108,7 +108,6 @@ def run_key_exchange(n,q):
 
     i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
-
     while(i < n):
         if(not check_robust_extractor(KA[i], KB[i], q)):
             #Redo single params
@@ -136,8 +135,6 @@ def run_key_exchange(n,q):
     #-----------------Results-------------------
     if SKA == SKB:
         print("Alice and Bob share the same key!")
-
-
     SKA = ''.join(map(str, SKA))
     SKB = ''.join(map(str, SKB))
     SKA = int(SKA)
@@ -152,7 +149,7 @@ def main():
 
     #Change the parameters here:
     n = 512
-    q = 2**32 - 1
+    q = 2**31 - 1
 
     run_key_exchange(n,q)
 
