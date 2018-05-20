@@ -23,10 +23,6 @@
 
 #include "jintailwe.h"
 
-/*-----------------------------Global Variables-------------------------------*/
-int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
-int M_TRANSPOSE[LATTICE_DIMENSION][LATTICE_DIMENSION]; //M transpose
-
 int main(){
   run_key_exchange();
   return 0;
@@ -35,34 +31,24 @@ int main(){
 void run_key_exchange(){
   srand(time(NULL));
   generate_M();
-
-  //------- Generate Alices parameters --------
   int i, j; // loop index
-  int *sA = generate_gaussian_vector();
-  int *eA = generate_gaussian_vector();
-  int pA[LATTICE_DIMENSION];
+  //------- Generate Alices parameters --------
 
-  for(i = 0; i < LATTICE_DIMENSION;i++){
-    for(j = 0; j < LATTICE_DIMENSION; j++){
-      pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
-    }
-    pA[i] = (pA[i] < 0) ? pA[i]%MODULO_Q + MODULO_Q : pA[i] % MODULO_Q;
-  }
+
   //------- Generate Bobs parameters ----------
-  int *sB = generate_gaussian_vector();
-  int *eB = generate_gaussian_vector();
-  int pB[LATTICE_DIMENSION];
+  Bob_params.secret_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  eB = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  Bob_params.public_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  generate_gaussian_vector(Bob_params.secret_vector);
+  generate_gaussian_vector(eB);
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
+      Bob_params.public_vector[i] = Bob_params.public_vector[i] + (M_TRANSPOSE[i][j]*Bob_params.secret_vector[j] + 2*eB[j]);
     }
-    pB[i] = (pB[i] < 0) ? pB[i] % MODULO_Q + MODULO_Q : pB[i] % MODULO_Q;
+    Bob_params.public_vector[i] = (Bob_params.public_vector[i] < 0) ? Bob_params.public_vector[i] % MODULO_Q + MODULO_Q : Bob_params.public_vector[i] % MODULO_Q;
   }
-
-  int edashA = generate_gaussian_scalar();
-  int edashB = generate_gaussian_scalar();
-
+  /*
   //Find Alices Key
 
   int KA = 0;
@@ -129,6 +115,7 @@ void run_key_exchange(){
     printf("SKB: %i\n", SKB);
     printf("SKA and SKB match!\n");
   }
+  */
 }
 
 //Generating the public matrix M once and for all
@@ -143,8 +130,11 @@ void generate_M(){
   }
 }
 
-int *generate_gaussian_vector(){
-  static int gauss_vec[LATTICE_DIMENSION];
+void generate_gaussian_matrix(){
+
+}
+
+void generate_gaussian_vector(int gauss_vec[LATTICE_DIMENSION]){
   int i; //Loop index
   int q = pow(LATTICE_DIMENSION,4);
   double alpha = pow((1/(double)LATTICE_DIMENSION),3);
@@ -155,8 +145,6 @@ int *generate_gaussian_vector(){
   for(i = 0; i < LATTICE_DIMENSION; i++){
     gauss_vec[i] = (int)normal_distribution(mu,sigma);
   }
-
-  return gauss_vec;
 }
 
 int generate_gaussian_scalar(){
@@ -167,14 +155,6 @@ int generate_gaussian_scalar(){
   int sigma = alpha*q;
 
   return (int)normal_distribution(mu,sigma);
-}
-
-void generate_Alice_parameters(){
-
-}
-
-void generate_Bob_parameters(){
-
 }
 
 int robust_extractor(int x, int sigma){
@@ -190,6 +170,12 @@ int signal_function(int y, int b){
   return !(y >= (double)-MODULO_Q/4 + b && y <= (double)MODULO_Q/4 + b);
 }
 
+void pretty_print_vector(){
+  int i;
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    printf("Vector[%i] = %i\n",i, Bob_params.secret_vector[i]);
+  }
+}
 /*------------------- Generate Gaussian numbers in C -------------------------*/
 
 /*
