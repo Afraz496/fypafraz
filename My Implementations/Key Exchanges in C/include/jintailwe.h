@@ -15,23 +15,6 @@
  * Core parameters and function prototypes for the PQC implementation
  */
 
- /********************************************************************************************
-  * A simple provably secure key exchange based on the learning with errors problem
-  *
-  *
-  * Based on the paper:
-  *     Jintai Ding, Xiang Xie and Xiaodong Ling
-  *
-  * Copyright (c) Jintai Ding, Xiang Xie and Xiaodong Ling for the theoretical key exchange
-  *               Afraz Arif Khan for implementing the key exchange in C and TLS
-  *
-  * Released under the MIT License; see LICENSE.txt for details.
-  ********************************************************************************************/
-
- /** \file jintailwe.h
-  * Core parameters and function prototypes for the PQC implementation
-  */
-
  #include <stdbool.h>
 
  #ifndef HEADER_JINTAILWE_H
