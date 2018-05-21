@@ -78,4 +78,12 @@ As referred to in the introduction section this is based on a simple key exchang
 
 `$ python simplekeyexchange.py`
 
-24/12/17 - This should only output SKA and SKB, from simple inspection they should both be 0 or 1 (provided the protocol was run honestly). 
+Instead of running the key exchange once there is a shell script included to run the key exchange 'n' times. It can be used as:
+
+`$ ./runsimplekexntimes n` <----- Here n specifies the number of times the key exchange runs before the program terminates.
+
+If you are using a Unix based system you will need to make the shell script executable before running the above command, this can be achieved by:
+
+`$ chmod u+x runsimplekexntimes`
+
+If you wish to terminate execution on Linux or Unix you can use the Ctrl+X command to terminate the script.
