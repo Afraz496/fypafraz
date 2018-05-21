@@ -43,7 +43,7 @@ int **EA; //Alices Error Matrix
 int *edashA; //Alices other error vector
 //Bob Params
 int *eB; //Bobs Error vector
-int edashB; //Bobs Error Scalar
+int *edashB; //Bobs Error Scalar
 
 /*------------------------------Function Prototypes---------------------------*/
 extern void run_key_exchange(); //Running the key exchange protocol based on public params
@@ -61,8 +61,8 @@ extern bool check_robust_extractor(int x, int y); // Condition for the validity 
 extern int signal_function(int y, int b); // A hint algorithm
 
 //----- Printing functions-----
-void pretty_print_vector(); //Prints a vector
-
+extern void pretty_print_vector(int vec[LATTICE_DIMENSION]); //Prints a vector
+extern void pretty_print_matrix(int matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]); //Prints a matrix 
 //------------------ Public Parameters for the key Exchange -------------------
 extern void generate_M();
 

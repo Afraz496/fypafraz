@@ -3,7 +3,7 @@
  *
  *
  * Based on the paper:
- *     Jintai Ding, Xiang Xie and Xiaodong Ling
+ *     Jintai Ding, Xiang Xie and Xiaodong Ling - 2012
  *
  * Copyright (c) Jintai Ding, Xiang Xie and Xiaodong Ling for the theoretical key exchange
  *               Afraz Arif Khan for implementing the key exchange in C and TLS
@@ -32,16 +32,53 @@ void run_key_exchange(){
   srand(time(NULL));
   generate_M();
   int i, j; // loop index
-  //------- Generate Alices parameters --------
 
+  /************ Allocate Temporary Memory on the Fly **************************/
+
+  //Alice Memory Allocation
+  Alice_params.secret_matrix =      (int**)malloc(LATTICE_DIMENSION*sizeof(int*));
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    Alice_params.secret_matrix[i] = (int*)malloc(LATTICE_DIMENSION*sizeof(int));
+  }
+  Alice_params.public_matrix =      (int**)malloc(LATTICE_DIMENSION*sizeof(int));
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    Alice_params.public_matrix[i] = (int*)malloc(LATTICE_DIMENSION*sizeof(int));
+  }
+
+  EA =                              (int**)malloc(LATTICE_DIMENSION*sizeof(int*));
+  for(i = 0;i < LATTICE_DIMENSION;i++){
+    EA[i] =                         (int*)malloc(LATTICE_DIMENSION*sizeof(int));
+  }
+  edashA =                          (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+
+  //Bob Memory Allocation
+  Bob_params.secret_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  eB =                       (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  Bob_params.public_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  edashB =                   (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  //------- Generate Alices parameters --------
+  generate_gaussian_matrix(Alice_params.secret_matrix);
+  generate_gaussian_matrix(EA);
+
+  /*
+  Implement the following Algorithm:
+
+  PA = (M.SA + 2*EA) mod q
+  */
+
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      Alice_params.public_matrix[i][j] = Alice_params.public_matrix[i][j] + (M[i][j]*Alice_params.secret_matrix[i][j] + 2*EA[i][j]);
+      Alice_params.public_matrix[i][j] = (Alice_params.public_matrix[i][j] < 0) ? Alice_params.public_matrix[i][j] % MODULO_Q + MODULO_Q : Alice_params.public_matrix[i][j] % MODULO_Q;
+    }
+  }
+  pretty_print_matrix(Alice_params.public_matrix);
 
   //------- Generate Bobs parameters ----------
-  Bob_params.secret_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
-  eB = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
-  Bob_params.public_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+
   generate_gaussian_vector(Bob_params.secret_vector);
   generate_gaussian_vector(eB);
-  pretty_print_vector();
+  generate_gaussian_vector(edashB);
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
@@ -49,6 +86,7 @@ void run_key_exchange(){
     }
     Bob_params.public_vector[i] = (Bob_params.public_vector[i] < 0) ? Bob_params.public_vector[i] % MODULO_Q + MODULO_Q : Bob_params.public_vector[i] % MODULO_Q;
   }
+
   /*
   //Find Alices Key
 
@@ -131,8 +169,19 @@ void generate_M(){
   }
 }
 
-void generate_gaussian_matrix(){
+void generate_gaussian_matrix(int gauss_matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
+  int i,j;
+  int q = pow(LATTICE_DIMENSION, 4);
+  double alpha = pow((1/(double)LATTICE_DIMENSION),3);
+  int mu = 0;
 
+  int sigma = alpha*q;
+
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      gauss_matrix[i][j] = (int)normal_distribution(mu,sigma);
+    }
+  }
 }
 
 void generate_gaussian_vector(int gauss_vec[LATTICE_DIMENSION]){
@@ -171,10 +220,20 @@ int signal_function(int y, int b){
   return !(y >= (double)-MODULO_Q/4 + b && y <= (double)MODULO_Q/4 + b);
 }
 
-void pretty_print_vector(){
+void pretty_print_matrix(int matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
+  int i, j;
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      printf("Matrix[%i][%i] = %i", i, j, matrix[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+void pretty_print_vector(int vec[LATTICE_DIMENSION]){
   int i;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    printf("Vector[%i] = %i\n",i, Bob_params.secret_vector[i]);
+    printf("Vector[%i] = %i\n",i, vec[i]);
   }
 }
 /*------------------- Generate Gaussian numbers in C -------------------------*/
