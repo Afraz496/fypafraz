@@ -57,22 +57,22 @@ void run_key_exchange(){
   Bob_params.public_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   edashB =                   (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   //------- Generate Alices parameters --------
-  generate_gaussian_matrix(Alice_params.secret_matrix);
+  generate_gaussian_matrix(Alice_params.secret_matrix); // <------ This function is not working
   generate_gaussian_matrix(EA);
+
 
   /*
   Implement the following Algorithm:
 
   PA = (M.SA + 2*EA) mod q
   */
-
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       Alice_params.public_matrix[i][j] = Alice_params.public_matrix[i][j] + (M[i][j]*Alice_params.secret_matrix[i][j] + 2*EA[i][j]);
       Alice_params.public_matrix[i][j] = (Alice_params.public_matrix[i][j] < 0) ? Alice_params.public_matrix[i][j] % MODULO_Q + MODULO_Q : Alice_params.public_matrix[i][j] % MODULO_Q;
     }
   }
-  pretty_print_matrix(Alice_params.public_matrix);
+
 
   //------- Generate Bobs parameters ----------
 
@@ -169,6 +169,8 @@ void generate_M(){
   }
 }
 
+
+//This function is broken for the globals
 void generate_gaussian_matrix(int gauss_matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
   int i,j;
   int q = pow(LATTICE_DIMENSION, 4);
@@ -224,7 +226,7 @@ void pretty_print_matrix(int matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
   int i, j;
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      printf("Matrix[%i][%i] = %i", i, j, matrix[i][j]);
+      printf("Matrix[%i][%i] = %i\n", i, j, matrix[i][j]);
     }
     printf("\n");
   }
