@@ -3,7 +3,7 @@
  *
  *
  * Based on the paper:
- *     Jintai Ding, Xiang Xie and Xiaodong Ling
+ *     Jintai Ding, Xiang Xie and Xiaodong Ling - 2012
  *
  * Copyright (c) Jintai Ding, Xiang Xie and Xiaodong Ling for the theoretical key exchange
  *               Afraz Arif Khan for implementing the key exchange in C and TLS
@@ -12,7 +12,7 @@
  ********************************************************************************************/
 
 /** \file jintailwe.c
- * Key exchange between Alice and Bob
+ * Key exchange between Alice and Bob.
  */
 
 #include <stdio.h>
@@ -35,6 +35,12 @@ int main(){
 void run_key_exchange(){
   srand(time(NULL));
   generate_M();
+
+  /*
+  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(1024,0,0,dgs_disc_gauss_uniform_table);
+  D->call(D); //as often needed
+  dgs_disc_gauss_dp_clear(D);
+  */
 
   //------- Generate Alices parameters --------
   int i, j; // loop index
