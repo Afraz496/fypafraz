@@ -151,15 +151,10 @@ void run_key_exchange(){
       //KA gen:
       for(j = 0; j < LATTICE_DIMENSION; j++){
         KA[i] = KA[i] + Alice1_params.secret_vector[j]*Bob_params.public_vector[j] + 2*edashA_single;
-      }
-
-      KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
-
-      //KB gen:
-      for(j = 0; j < LATTICE_DIMENSION; j++){
         KB[i] = KB[i] + Alice1_params.public_vector[j]*Bob_params.secret_vector[j] + 2*edashB_single;
       }
 
+      KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
       KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
     }
     else{
