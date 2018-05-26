@@ -36,14 +36,30 @@ struct matrix_params{
 int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
 int M_TRANSPOSE[LATTICE_DIMENSION][LATTICE_DIMENSION]; //M transpose
 struct matrix_params Alice_params;
+struct vector_params Alice1_params;
 struct vector_params Bob_params;
 
 //Alice Params
 int **EA; //Alices Error Matrix
 int *edashA; //Alices other error vector
+int *KA;
+int *SKA;
+
+//----Resampling----
+int *eA; // in case of resampling
+int edashA_single; //for single bit value of KA
+
 //Bob Params
 int *eB; //Bobs Error vector
 int *edashB; //Bobs Error Scalar
+int *KB;
+int *SKB;
+
+//----Resampling----
+int edashB_single; //for single bit value of KB
+
+//Signal generated
+int *sig; //either 0 or 1 at any index
 
 /*------------------------------Function Prototypes---------------------------*/
 extern void run_key_exchange(); //Running the key exchange protocol based on public params
@@ -60,9 +76,11 @@ extern bool check_robust_extractor(int x, int y); // Condition for the validity 
 
 extern int signal_function(int y, int b); // A hint algorithm
 
+extern void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, bool client); //Single Vector Public in case of resampling
+
 //----- Printing functions-----
 extern void pretty_print_vector(int vec[LATTICE_DIMENSION]); //Prints a vector
-extern void pretty_print_matrix(int matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]); //Prints a matrix 
+extern void pretty_print_matrix(int **matrix); //Prints a matrix
 //------------------ Public Parameters for the key Exchange -------------------
 extern void generate_M();
 

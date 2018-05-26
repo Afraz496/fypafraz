@@ -24,23 +24,14 @@
 #include "jintailwe.h"
 
 int main(){
-  run_key_exchange();
-  return 0;
-}
-
-void run_key_exchange(){
-  srand(time(NULL));
-  generate_M();
-  int i, j; // loop index
-
   /************ Allocate Temporary Memory on the Fly **************************/
-
+  uint16_t i, j;
   //Alice Memory Allocation
   Alice_params.secret_matrix =      (int**)malloc(LATTICE_DIMENSION*sizeof(int*));
   for(i = 0; i < LATTICE_DIMENSION; i++){
     Alice_params.secret_matrix[i] = (int*)malloc(LATTICE_DIMENSION*sizeof(int));
   }
-  Alice_params.public_matrix =      (int**)malloc(LATTICE_DIMENSION*sizeof(int));
+  Alice_params.public_matrix =      (int**)malloc(LATTICE_DIMENSION*sizeof(int*));
   for(i = 0; i < LATTICE_DIMENSION; i++){
     Alice_params.public_matrix[i] = (int*)malloc(LATTICE_DIMENSION*sizeof(int));
   }
@@ -51,21 +42,44 @@ void run_key_exchange(){
   }
   edashA =                          (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
 
+  KA =                              (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+
+  SKA =                             (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+
+  //Resampling for Alice:
+  Alice1_params.secret_vector =     (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  Alice1_params.public_vector =     (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  eA =                              (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+
   //Bob Memory Allocation
   Bob_params.secret_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   eB =                       (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   Bob_params.public_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   edashB =                   (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
-  //------- Generate Alices parameters --------
-  generate_gaussian_matrix(Alice_params.secret_matrix); // <------ This function is not working
-  generate_gaussian_matrix(EA);
+  KB =                       (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  SKB =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
 
+  //Signal Memory Allocation
+  sig =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  run_key_exchange();
+  return 0;
+}
+
+void run_key_exchange(){
+  srand(time(NULL));
+  generate_M();
+  int i, j; // loop index
+  //------- Generate Alices parameters --------
+  generate_gaussian_matrix(Alice_params.secret_matrix);
+  generate_gaussian_matrix(EA);
 
   /*
   Implement the following Algorithm:
 
   PA = (M.SA + 2*EA) mod q
   */
+
+  //Generate Public Parameter
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       Alice_params.public_matrix[i][j] = Alice_params.public_matrix[i][j] + (M[i][j]*Alice_params.secret_matrix[i][j] + 2*EA[i][j]);
@@ -73,6 +87,7 @@ void run_key_exchange(){
     }
   }
 
+  generate_gaussian_vector(edashA);
 
   //------- Generate Bobs parameters ----------
 
@@ -80,6 +95,7 @@ void run_key_exchange(){
   generate_gaussian_vector(eB);
   generate_gaussian_vector(edashB);
 
+  //Generate Public Parameter
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       Bob_params.public_vector[i] = Bob_params.public_vector[i] + (M_TRANSPOSE[i][j]*Bob_params.secret_vector[j] + 2*eB[j]);
@@ -87,74 +103,90 @@ void run_key_exchange(){
     Bob_params.public_vector[i] = (Bob_params.public_vector[i] < 0) ? Bob_params.public_vector[i] % MODULO_Q + MODULO_Q : Bob_params.public_vector[i] % MODULO_Q;
   }
 
-  /*
-  //Find Alices Key
 
-  int KA = 0;
+  //Find Alices Key
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      KA[i] = KA[i] + Alice_params.secret_matrix[j][i]*Bob_params.public_vector[j] + 2*edashA[j];
+    }
+    KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
   }
+
 
   //Find Bobs Key
 
-  int KB = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      KB[i] = KB[i] + Alice_params.public_matrix[j][i]*Bob_params.secret_vector[j] + 2*edashB[j];
+    }
+    KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
   }
+
+
+
+
 
   //-- Check the robust extractor condition till correct params generated ----
 
-  while(!check_robust_extractor(KA,KB)){
-    sA = generate_gaussian_vector();
-    eA = generate_gaussian_vector();
+  i = 0;
+  bool Alice_gen = true;
+  bool Bob_gen = false;
+  while(i < LATTICE_DIMENSION){
+    if(!check_robust_extractor(KA[i], KB[i])){
+      //Redo single parameters
 
-    for(i = 0; i < LATTICE_DIMENSION;i++){
+      //Alice's Params
+      generate_gaussian_vector(Alice1_params.secret_vector);
+      generate_gaussian_vector(eA);
+      generate_public_vector(Alice1_params.secret_vector,eA,Alice1_params.public_vector,Alice_gen);
+      edashA_single = generate_gaussian_scalar();
+
+
+      //Bob's params
+      generate_gaussian_vector(Bob_params.secret_vector);
+      generate_gaussian_vector(eB);
+      generate_public_vector(Bob_params.secret_vector,eB,Bob_params.public_vector,Bob_gen);
+      edashB_single = generate_gaussian_scalar();
+
+      //KA gen:
       for(j = 0; j < LATTICE_DIMENSION; j++){
-        pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
+        KA[i] = KA[i] + Alice1_params.secret_vector[j]*Bob_params.public_vector[j] + 2*edashA_single;
       }
-      pA[i] = pA[i]%MODULO_Q;
-    }
-    //------- Generate Bobs parameters ----------
-    sB = generate_gaussian_vector();
-    eB = generate_gaussian_vector();
 
-    for(i = 0; i < LATTICE_DIMENSION;i++){
+      KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
+
+      //KB gen:
       for(j = 0; j < LATTICE_DIMENSION; j++){
-        pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
+        KB[i] = KB[i] + Alice1_params.public_vector[j]*Bob_params.secret_vector[j] + 2*edashB_single;
       }
-      pB[i] = pB[i]%MODULO_Q;
+
+      KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
     }
-
-    edashA = generate_gaussian_scalar();
-    edashB = generate_gaussian_scalar();
-
-    //Find Alices Key
-    KA = 0;
-    for(i = 0; i < LATTICE_DIMENSION; i++){
-      KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
+    else{
+      i = i+1;
     }
-
-
-    //Find Bobs Key
-    KB = 0;
-    for(i = 0; i < LATTICE_DIMENSION; i++){
-      KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
-    }
-
   }
-  //Obtain a signal
-  int sig = signal_function(KB, 0);
-  //-- Obtain shared keys between Alice and Bob ----
-  int SKA = robust_extractor(KA, sig);
-  int SKB = robust_extractor(KB, sig);
 
+  //Shared Keys
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    sig[i] = signal_function(KB[i], 0);
+    SKA[i] = robust_extractor(KA[i], sig[i]);
+    SKB[i] = robust_extractor(KB[i], sig[i]);
+  }
+
+  bool kex_success = true;
   //--- Check if the keys are the same ---
-  if(SKA == SKB){
-    printf("SKA: %i\n", SKA);
-    printf("SKB: %i\n", SKB);
-    printf("SKA and SKB match!\n");
+  for(i = 0;i < LATTICE_DIMENSION; i++){
+    if(SKA[i] != SKB[i]){
+      printf("%i\n", i);
+      kex_success = false;
+    }
   }
-  */
+
+  if(kex_success){
+    printf("Key Exchange worked, Alice and Bob Share the same key!\n");
+  }
+
 }
 
 //Generating the public matrix M once and for all
@@ -169,9 +201,31 @@ void generate_M(){
   }
 }
 
+void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, bool client){
+  uint16_t i, j;
+
+  if(!client){
+
+    for(i = 0;i < LATTICE_DIMENSION; i++){
+      for(j = 0; j < LATTICE_DIMENSION; j++){
+          public_vec[i] = public_vec[i] + M_TRANSPOSE[i][j]*secret_vec[j] + 2*error_vec[j];
+        }
+        public_vec[i] = (public_vec[i] < 0) ? public_vec[i] % MODULO_Q + MODULO_Q : public_vec[i] % MODULO_Q;
+      }
+  }
+  else{
+    for(i = 0;i < LATTICE_DIMENSION; i++){
+      for(j = 0; j < LATTICE_DIMENSION; j++){
+          public_vec[i] = public_vec[i] + M[i][j]*secret_vec[j] + 2*error_vec[j];
+        }
+        public_vec[i] = (public_vec[i] < 0) ? public_vec[i] % MODULO_Q + MODULO_Q : public_vec[i] % MODULO_Q;
+      }
+  }
+}
+
 
 //This function is broken for the globals
-void generate_gaussian_matrix(int gauss_matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
+void generate_gaussian_matrix(int **gauss_matrix){
   int i,j;
   int q = pow(LATTICE_DIMENSION, 4);
   double alpha = pow((1/(double)LATTICE_DIMENSION),3);
@@ -222,7 +276,7 @@ int signal_function(int y, int b){
   return !(y >= (double)-MODULO_Q/4 + b && y <= (double)MODULO_Q/4 + b);
 }
 
-void pretty_print_matrix(int matrix[LATTICE_DIMENSION][LATTICE_DIMENSION]){
+void pretty_print_matrix(int **matrix){
   int i, j;
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
