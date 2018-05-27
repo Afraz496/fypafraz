@@ -67,7 +67,7 @@ def generate_gaussian_scalar():
 def generate_alice_params(M,n,q):
     SA = generate_gaussian_matrix(n)
     EA = generate_gaussian_matrix(n)
-    PA = (M.dot(SA) + 2*EA)%q
+    PA = (M.dot(SA) + 2*EA)%q #<-- The .dot operation is THE COMPUTATIONAL CHUNK 
     return PA,SA
 
 def generate_single_alice_params(M,n,q):
