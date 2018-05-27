@@ -131,6 +131,7 @@ void run_key_exchange(){
   i = 0;
   bool Alice_gen = true;
   bool Bob_gen = false;
+
   while(i < LATTICE_DIMENSION){
     if(!check_robust_extractor(KA[i], KB[i])){
       //Redo single parameters
@@ -162,9 +163,10 @@ void run_key_exchange(){
     }
   }
 
+
   //Shared Keys
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    sig[i] = signal_function(KB[i], 0);
+    sig[i] = signal_function(KB[i], rand()%2);
     SKA[i] = robust_extractor(KA[i], sig[i]);
     SKB[i] = robust_extractor(KB[i], sig[i]);
   }
