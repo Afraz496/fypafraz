@@ -85,7 +85,7 @@ def generate_bob_params(M,n,q):
 def generate_signal(n, KB, q):
     signal = []
     for i in range(0, n):
-        signal.append(signal_functions(KB[i],0,q))
+        signal.append(signal_functions(KB[i],randint(0,1),q))
     return signal
 
 def run_key_exchange(n,q):
