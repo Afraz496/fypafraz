@@ -1,0 +1,7 @@
+Generating M took 3.783 milliseconds.
+Alice's parameters took 29.784 milliseconds.
+Bob's parameters took 1.783 milliseconds.
+KA and KB took 4.414 milliseconds.
+This while loop took 9.819 milliseconds.
+Alice and Bob share the same key!
+This program took 54.55 milliseconds.
