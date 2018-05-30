@@ -7,6 +7,9 @@
 *.obj
 *.elf
 
+# Text Files
+*.txt
+
 # Linker output
 *.ilk
 *.map
