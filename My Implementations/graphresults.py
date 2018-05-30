@@ -27,15 +27,70 @@ Based on the sample, noticeable values (the milliseconds values are located at a
 """
 
 import sys
+import matplotlib.pyplot as plt
+
+def calculate_length_without_correctness(length):
+    done = False
+    new_length = length
+    i = 5
+    while(not done):
+        new_length -= 1
+        i += 7
+        if i > new_length:
+            done = True
+    return new_length
+
+def avg(l):
+    return sum(l)/len(l)
+
+def correctness(same):
+    if same == "same ":
+        return True
+    else:
+        return False
 
 with open('simplekexresults.txt', 'r') as k:
     lines = k.read().splitlines()
 
-indexes = [18, 24, 22, 15, 22, 24, 28, 18]
-times = [""]*7
-print(times)
+indexes = [18, 24, 22, 15, 21, 24, 18]
+times = [""]*len(lines)
 for i in range(0, len(lines)):
     line = lines[i]
-    times[i] = line[indexes[i]:indexes[i]+5]
+    times[i] = line[indexes[i%7]:indexes[i%7]+5]
 
-print(times)
+del(times[5::7]) #Remove same
+
+#Convert to numbers
+M_gen = []
+Alice_params = []
+Bob_params = []
+Key_gen = []
+While_loop = []
+total_execution = []
+
+OFFSET_AFTER_DELETION = 6
+#Conversion to floats and appending invidiual params
+for i in range(0, len(times)):
+    times[i] = float(times[i])
+    if i%OFFSET_AFTER_DELETION == 0:
+        M_gen.append(times[i])
+    elif i%OFFSET_AFTER_DELETION == 1:
+        Alice_params.append(times[i])
+    elif i%OFFSET_AFTER_DELETION == 2:
+        Bob_params.append(times[i])
+    elif i%OFFSET_AFTER_DELETION == 3:
+        Key_gen.append(times[i])
+    elif i%OFFSET_AFTER_DELETION == 4:
+        While_loop.append(times[i])
+    elif i%OFFSET_AFTER_DELETION == 5:
+        total_execution.append(times[i])
+
+plt.plot(total_execution)
+plt.ylabel('Total program execution time/ms')
+plt.show()
+print("Average run time for M is " + str(avg(M_gen)))
+print("Average run time for Alice Params is " + str(avg(Alice_params)))
+print("Average run time for Bob Params is " + str(avg(Bob_params)))
+print("Average run time for Key_gen is " + str(avg(Key_gen)))
+print("Average run time for While Loop is " + str(avg(While_loop)))
+print("Average run time for total key exchange is " + str(avg(total_execution)))

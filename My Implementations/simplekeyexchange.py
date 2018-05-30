@@ -15,8 +15,11 @@ import datetime
 def print_time(s, instance):
     #s: seconds, instance: Reference in program execution
     s = s*1000 #Conversion to milliseconds
-
-    print(instance + str(s) + " milliseconds.")
+    if s < 10:
+        s = "%4f"%s
+    else:
+        s = str(s)
+    print(instance + s + " milliseconds.")
 
 #This function must return either a 0 or a 1
 def robust_extractor(x, sigma, q):
@@ -162,7 +165,7 @@ def run_key_exchange(n,q):
     if SKA == SKB:
         print("Alice and Bob share the same key!")
 
-    #Comment this part underneath to get the correct results data from graphresults.py 
+    #Comment this part underneath to get the correct results data from graphresults.py
     """
     SKA = ''.join(map(str, SKA))
     SKB = ''.join(map(str, SKB))
