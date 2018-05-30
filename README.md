@@ -54,7 +54,7 @@ As referred to in the introduction section this is based on a simple key exchang
 
 `$ python simplekeyexchange.py`
 
-24/12/17 - This should only output SKA and SKB, from simple inspection they should both be 0 or 1 (provided the protocol was run honestly). 
+This protocol can now partake in n-bit security. In the python script the parameter 'n' in the main() function represents the lattice dimension, it can be changed to increase the brute force security. Currently the lattice dimension is set to 512. 
 
 ## Test Results
 
