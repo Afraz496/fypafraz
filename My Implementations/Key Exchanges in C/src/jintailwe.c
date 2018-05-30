@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "jintailwe.h"
+#include "dgs.h"
 
 /*-----------------------------Global Variables-------------------------------*/
 int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
@@ -36,11 +37,12 @@ void run_key_exchange(){
   srand(time(NULL));
   generate_M();
 
-  /*
-  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(1024,0,0,dgs_disc_gauss_uniform_table);
+
+  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(1024,0,1,DGS_DISC_GAUSS_UNIFORM_TABLE);
   D->call(D); //as often needed
+  printf("%d\n",D); //See the value of D
   dgs_disc_gauss_dp_clear(D);
-  */
+
 
   //------- Generate Alices parameters --------
   int i, j; // loop index
