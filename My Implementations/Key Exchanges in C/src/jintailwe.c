@@ -24,10 +24,6 @@
 #include "jintailwe.h"
 #include "dgs.h"
 
-/*-----------------------------Global Variables-------------------------------*/
-int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
-int M_TRANSPOSE[LATTICE_DIMENSION][LATTICE_DIMENSION]; //M transpose
-
 int main(){
   run_key_exchange();
   return 0;
@@ -36,12 +32,6 @@ int main(){
 void run_key_exchange(){
   srand(time(NULL));
   generate_M();
-
-
-  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(1024,0,1,DGS_DISC_GAUSS_UNIFORM_TABLE);
-  D->call(D); //as often needed
-  printf("%d\n",D); //See the value of D
-  dgs_disc_gauss_dp_clear(D);
 
 
   //------- Generate Alices parameters --------
@@ -54,7 +44,7 @@ void run_key_exchange(){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
     }
-    pA[i] = pA[i]%MODULO_Q;
+    pA[i] = (pA[i] < 0) ? pA[i]%MODULO_Q + MODULO_Q : pA[i]%MODULO_Q;
   }
   //------- Generate Bobs parameters ----------
   int *sB = generate_gaussian_vector();
@@ -65,7 +55,7 @@ void run_key_exchange(){
     for(j = 0; j < LATTICE_DIMENSION; j++){
       pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
     }
-    pB[i] = pB[i]%MODULO_Q;
+    pB[i] = (pB[i] < 0) ? pB[i]%MODULO_Q + MODULO_Q : pB[i]%MODULO_Q;
   }
 
   int edashA = generate_gaussian_scalar();
@@ -75,18 +65,20 @@ void run_key_exchange(){
 
   int KA = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
+    KA = KA + (sA[i]*pB[i] + 2*edashA);
+    KA = (KA < 0) ? KA % MODULO_Q + MODULO_Q : KA % MODULO_Q;
   }
 
   //Find Bobs Key
 
   int KB = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
+    KB = KB + (pA[i]*sB[i] + 2*edashB);
+    KB = (KB < 0) ? KB % MODULO_Q + MODULO_Q : KB % MODULO_Q;
   }
 
   //-- Check the robust extractor condition till correct params generated ----
-
+  /*
   while(!check_robust_extractor(KA,KB)){
     sA = generate_gaussian_vector();
     eA = generate_gaussian_vector();
@@ -127,8 +119,8 @@ void run_key_exchange(){
     }
 
 
-
   }
+  */
   //Obtain a signal
   int sig = signal_function(KB, 0);
   //-- Obtain shared keys between Alice and Bob ----
@@ -158,35 +150,21 @@ void generate_M(){
 int *generate_gaussian_vector(){
   static int gauss_vec[LATTICE_DIMENSION];
   int i; //Loop index
-  int q = pow(LATTICE_DIMENSION,4);
-  double alpha = pow((1/(double)LATTICE_DIMENSION),3);
   int mu = 0;
 
-  int sigma = alpha*q;
+  int sigma = LATTICE_DIMENSION;
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    gauss_vec[i] = (int)normal_distribution(mu,sigma);
+    gauss_vec[i] = discrete_normal_distribution(mu,sigma);
   }
 
   return gauss_vec;
 }
 
 int generate_gaussian_scalar(){
-  int q = 1;
-  int alpha = 1;
   int mu = 0;
-
-  int sigma = alpha*q;
-
-  return (int)normal_distribution(mu,sigma);
-}
-
-void generate_Alice_parameters(){
-
-}
-
-void generate_Bob_parameters(){
-
+  int sigma = 1;
+  return discrete_normal_distribution(mu,sigma);
 }
 
 int robust_extractor(int x, int sigma){
@@ -226,20 +204,8 @@ int signal_function(int y, int b){
 
 /*------------------- Generate Gaussian numbers in C -------------------------*/
 
-/*
-This method makes use of the Box-Mueller implementation, Casting is required for Discrete Gaussian behaviour
-*/
-double RNG(){
-  return ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
-}
- // return a normally distributed random number (without variance and mean)
-double normal_distribution_number(){
-  double y1=RNG();
-  double y2=RNG();
-  return cos(2*3.14*y2)*sqrt(-2.*log(y1));
-}
-
-//Hub function
-double normal_distribution(double mean, double sigma){
-  return normal_distribution_number()*sigma + mean;
+//This is using the dgs library, all copyright is protected under the source files of the dgs library
+long discrete_normal_distribution(int mean, int sigma){
+  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(sigma,mean,1,DGS_DISC_GAUSS_UNIFORM_TABLE);
+  return D->call(D);
 }

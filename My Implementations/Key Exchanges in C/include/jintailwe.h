@@ -15,40 +15,39 @@
  * Core parameters and function prototypes for the PQC implementation
  */
 
- #include <stdbool.h>
+#include <stdbool.h>
 
- #ifndef HEADER_JINTAILWE_H
+#include "dgs.h"
 
- #define LATTICE_DIMENSION 512 // Matrix Dimension
- #define MODULO_Q 2147483647 // q - The modulo factor
+#ifndef HEADER_JINTAILWE_H
 
- /*------------------------------Function Prototypes---------------------------*/
- void run_key_exchange(); //Running the key exchange protocol based on public params
+#define LATTICE_DIMENSION 512 // Matrix Dimension
+#define MODULO_Q 2147483647 // q - The modulo factor
 
- int * generate_gaussian_vector(); // Generate a vector sampled from the Discrete Gaussian distribution
+/*-----------------------------Global Variables-------------------------------*/
+int M[LATTICE_DIMENSION][LATTICE_DIMENSION]; //Public parameter M
+int M_TRANSPOSE[LATTICE_DIMENSION][LATTICE_DIMENSION]; //M transpose
 
- int generate_gaussian_scalar(); // Generate a discrete gaussian scalar value
+/*------------------------------Function Prototypes---------------------------*/
+void run_key_exchange(); //Running the key exchange protocol based on public params
 
- int robust_extractor(int x, int sigma); // Find the same shared key
+int * generate_gaussian_vector(); // Generate a vector sampled from the Discrete Gaussian distribution
 
- bool check_robust_extractor(int x, int y); // Condition for the validity of the robust extractor
+int generate_gaussian_scalar(); // Generate a discrete gaussian scalar value
 
- int signal_function(int y, int b); // A hint algorithm
+int robust_extractor(int x, int sigma); // Find the same shared key
 
- //------------------ Public Parameters for the key Exchange -------------------
- void generate_M();
+bool check_robust_extractor(int x, int y); // Condition for the validity of the robust extractor
 
- void generate_Alice_parameters(); // Alices private parameters
+int signal_function(int y, int b); // A hint algorithm
 
- void generate_Bob_parameters(); // Bobs private parameters
+//------------------ Public Parameters for the key Exchange -------------------
+void generate_M();
 
- //------------------ Generate gaussian numbers in C ----------------------------
- double RNG();
+//------------------ Generate gaussian numbers in C ----------------------------
 
- double normal_distribution_number();
+long discrete_normal_distribution(int mean, int sigma);
 
- double normal_distribution(double mean, double sigma);
+/*---------------------------End of Function Prototypes-----------------------*/
 
- /*---------------------------End of Function Prototypes-----------------------*/
-
- #endif
+#endif
