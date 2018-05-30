@@ -55,3 +55,16 @@ As referred to in the introduction section this is based on a simple key exchang
 `$ python simplekeyexchange.py`
 
 24/12/17 - This should only output SKA and SKB, from simple inspection they should both be 0 or 1 (provided the protocol was run honestly). 
+
+## Test Results
+
+If you are interested in individual parameters and the total execution time of the program there is an already available script specifically designed to find the average of all the printed output of 'simplekeyexchange.py' and this script also plots a graph of the exeuction time for 'n' points. 
+
+To make use of this test-suite first type:
+
+`$ ./runsimplekexntimes.sh 100 > simplekexresults.txt` (if you want 100 results)
+
+Then simply type:
+
+`$ python graphresults.py`
+
