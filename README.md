@@ -64,7 +64,7 @@ Further examinations on how these 2 pieces of software will be optimised will be
 
 ### My Implementations
 
-#### Simple Key exchange
+#### Simple Key exchange in Python
 
 Before executing the program you must at least have python 2.x in your system. The following dependency is required for generating the matrices in the program:
 
@@ -87,3 +87,60 @@ If you are using a Unix based system you will need to make the shell script exec
 `$ chmod u+x runsimplekexntimes`
 
 If you wish to terminate execution on Linux or Unix you can use the Ctrl+X command to terminate the script.
+
+#### Key Exchanges in C
+
+If you have navigated to ~/fypafraz/My \Implementations/
+
+Then you will see all the python folders and another folder called "Key Exchanges in C"
+
+Type the following in the terminal:
+
+`$ cd Key\ Exchanges\ in\ C/` <-- Again if you type 'K' press TAB and it will complete the rest in Terminal
+
+Then type:
+
+`$ ls`
+
+It should list 2 folders and 1 shell script. The folders are:
+
+- include (this includes the header files for the main script and the discrete gaussian scripts)
+- src (this includes the C source files)
+
+The shell script is called installationfordgs.sh
+
+To use the shell script to install dependencies first type:
+
+`$ chmod u+x installationfordgs.sh`
+
+Then type:
+
+`$ ./installationfordgs.sh`
+
+To use the scripts you must navigate to the 'src' folder by doing `$ cd src`
+
+In this folder before you compile the code there is a missing obj folder. There is a shell script available to install the obj directory for you:
+
+To use the shell script type:
+
+`$ chmod u+x createbojfiles.sh`
+
+Then type:
+
+`$ ./createobjfiles.sh`
+
+This will create a folder called 'obj' and will install the relevant .o (object files). It is very important that this step is done before the program is compiled otherwise there will be linker errors.
+
+Finally back in the 'src' folder type:
+
+`$ make`
+
+This will show a large number of warnings (unavoidable as the dgs library does not cater to the compiler warnings) but it should give no errors. If you see any errors then some of the installation steps have not worked and you may need to refer to them again. 
+
+After you typed `make` there is an exectuable file available called 'jintailwe' (without any extensions)
+
+Finally to run the code type:
+
+`$ ./jintailwe`
+
+This will run the key exchange and output whether the keys matched or not.
