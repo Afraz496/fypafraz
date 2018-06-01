@@ -21,6 +21,8 @@
 #include <stdbool.h>
 #include <math.h>
 
+#include "omp.h"
+
 #include "jintailwe.h"
 #include "dgs.h"
 
@@ -71,7 +73,12 @@ void run_key_exchange(){
   generate_M();
   int i, j; // loop index
   //------- Generate Alices parameters --------
+  time_t t;
+  t = clock();
   generate_gaussian_matrix(Alice_params.secret_matrix);
+  t = clock() - t;
+  double time_taken = ((double)t)/CLOCKS_PER_SEC;
+  printf("Alice Matrix took: %f\n", time_taken);
   generate_gaussian_matrix(EA);
 
   /*
@@ -225,15 +232,13 @@ void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, boo
 
 //This function is broken for the globals
 void generate_gaussian_matrix(int **gauss_matrix){
-  int i,j;
   int mu = 0;
 
-  int sigma = LATTICE_DIMENSION;
-
-  for(i = 0; i < LATTICE_DIMENSION; i++){
-    for(j = 0; j < LATTICE_DIMENSION; j++){
+  int sigma = 512;
+  #pragma omp parallel for num_threads(4) collapse(2)
+  for(int i = 0; i < 512; i++){
+    for(int j = 0; j < 512; j++){
       gauss_matrix[i][j] = discrete_normal_distribution(mu,sigma);
-      printf("%i\n", gauss_matrix[i][j]);
     }
   }
 }

@@ -1,5 +1,5 @@
 IDIR=../include
-CC=gcc
+CC=gcc-8
 CFLAGS=-I$(IDIR)
 
 ODIR=obj
@@ -31,7 +31,7 @@ $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 jintailwe: $(OBJ)
-	gcc -o  $@ $^ $(CFLAGS) $(LIBS)
+	$(CC) -fopenmp -o  $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
