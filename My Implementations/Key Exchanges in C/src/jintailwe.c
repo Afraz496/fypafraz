@@ -129,8 +129,6 @@ void run_key_exchange(){
 
   //--- Check if the keys are the same ---
   if(SKA == SKB){
-    printf("SKA: %i\n", SKA);
-    printf("SKB: %i\n", SKB);
     printf("SKA and SKB match!\n");
   }
 }
@@ -206,6 +204,7 @@ int signal_function(int y, int b){
 
 //This is using the dgs library, all copyright is protected under the source files of the dgs library
 long discrete_normal_distribution(int mean, int sigma){
-  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(sigma,mean,1,DGS_DISC_GAUSS_UNIFORM_TABLE);
+  uint8_t tau = 6;
+  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(sigma,mean,tau,DGS_DISC_GAUSS_UNIFORM_TABLE);
   return D->call(D);
 }
