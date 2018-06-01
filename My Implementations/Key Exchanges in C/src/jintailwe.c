@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "jintailwe.h"
+#include "dgs.h"
 
 int main(){
   /************ Allocate Temporary Memory on the Fly **************************/
@@ -120,6 +121,7 @@ void run_key_exchange(){
       KB[i] = KB[i] + Alice_params.public_matrix[j][i]*Bob_params.secret_vector[j] + 2*edashB[j];
     }
     KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
+    printf("%i\n", KB[i]);
   }
 
 
@@ -127,7 +129,7 @@ void run_key_exchange(){
 
 
   //-- Check the robust extractor condition till correct params generated ----
-
+  /*
   i = 0;
   bool Alice_gen = true;
   bool Bob_gen = false;
@@ -162,7 +164,7 @@ void run_key_exchange(){
       i = i+1;
     }
   }
-
+  */
 
   //Shared Keys
   for(i = 0; i < LATTICE_DIMENSION; i++){
@@ -224,40 +226,32 @@ void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, boo
 //This function is broken for the globals
 void generate_gaussian_matrix(int **gauss_matrix){
   int i,j;
-  int q = pow(LATTICE_DIMENSION, 4);
-  double alpha = pow((1/(double)LATTICE_DIMENSION),3);
   int mu = 0;
 
-  int sigma = alpha*q;
+  int sigma = LATTICE_DIMENSION;
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      gauss_matrix[i][j] = (int)normal_distribution(mu,sigma);
+      gauss_matrix[i][j] = discrete_normal_distribution(mu,sigma);
+      printf("%i\n", gauss_matrix[i][j]);
     }
   }
 }
 
 void generate_gaussian_vector(int gauss_vec[LATTICE_DIMENSION]){
   int i; //Loop index
-  int q = pow(LATTICE_DIMENSION,4);
-  double alpha = pow((1/(double)LATTICE_DIMENSION),3);
   int mu = 0;
-
-  int sigma = alpha*q;
+  int sigma = LATTICE_DIMENSION;
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    gauss_vec[i] = (int)normal_distribution(mu,sigma);
+    gauss_vec[i] = discrete_normal_distribution(mu,sigma);
   }
 }
 
 int generate_gaussian_scalar(){
-  int q = 1;
-  int alpha = 1;
   int mu = 0;
-
-  int sigma = alpha*q;
-
-  return (int)normal_distribution(mu,sigma);
+  int sigma = 1;
+  return discrete_normal_distribution(mu,sigma);
 }
 
 int robust_extractor(int x, int sigma){
@@ -291,20 +285,9 @@ void pretty_print_vector(int vec[LATTICE_DIMENSION]){
 }
 /*------------------- Generate Gaussian numbers in C -------------------------*/
 
-/*
-This method makes use of the Box-Mueller implementation, Casting is required for Discrete Gaussian behaviour
-*/
-double RNG(){
-  return ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
-}
- // return a normally distributed random number (without variance and mean)
-double normal_distribution_number(){
-  double y1=RNG();
-  double y2=RNG();
-  return cos(2*3.14*y2)*sqrt(-2.*log(y1));
-}
-
-//Hub function
-double normal_distribution(double mean, double sigma){
-  return normal_distribution_number()*sigma + mean;
+//Makes use of the dgs library
+long discrete_normal_distribution(int mean, int sigma){
+  uint8_t tau = 6;
+  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(sigma,mean,tau,DGS_DISC_GAUSS_UNIFORM_TABLE);
+  return D->call(D);
 }
