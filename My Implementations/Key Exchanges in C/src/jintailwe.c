@@ -154,6 +154,7 @@ int *generate_gaussian_vector(){
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
     gauss_vec[i] = discrete_normal_distribution(mu,sigma);
+    printf("gauss_vec[%i] = %i\n", i, gauss_vec[i]);
   }
 
   return gauss_vec;
