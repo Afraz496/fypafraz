@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include <stdbool.h>
 #include <math.h>
 
@@ -42,7 +43,7 @@ void run_key_exchange(){
 
   for(i = 0; i < LATTICE_DIMENSION;i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
+      pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
     }
     pA[i] = (pA[i] < 0) ? pA[i]%MODULO_Q + MODULO_Q : pA[i]%MODULO_Q;
   }
@@ -78,16 +79,15 @@ void run_key_exchange(){
   }
 
   //-- Check the robust extractor condition till correct params generated ----
-  /*
   while(!check_robust_extractor(KA,KB)){
     sA = generate_gaussian_vector();
     eA = generate_gaussian_vector();
 
     for(i = 0; i < LATTICE_DIMENSION;i++){
       for(j = 0; j < LATTICE_DIMENSION; j++){
-        pA[i] = pA[i] + (M_TRANSPOSE[i][j]*sA[j] + 2*eA[j]);
+        pA[i] = pA[i] + (M[i][j]*sA[j] + 2*eA[j]);
       }
-      pA[i] = pA[i]%MODULO_Q;
+      pA[i] = (pA[i] < 0) ? pA[i]%MODULO_Q + MODULO_Q : pA[i]%MODULO_Q;
     }
     //------- Generate Bobs parameters ----------
     sB = generate_gaussian_vector();
@@ -97,7 +97,7 @@ void run_key_exchange(){
       for(j = 0; j < LATTICE_DIMENSION; j++){
         pB[i] = pB[i] + (M_TRANSPOSE[i][j]*sB[j] + 2*eB[j]);
       }
-      pB[i] = pB[i]%MODULO_Q;
+      pB[i] = (pB[i] < 0) ? pB[i]%MODULO_Q + MODULO_Q : pB[i]%MODULO_Q;
     }
 
     edashA = generate_gaussian_scalar();
@@ -108,21 +108,21 @@ void run_key_exchange(){
     //Find Alices Key
     KA = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KA = abs((KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q);
+      KA = (KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q;
+      KA = (KA < 0) ? KA % MODULO_Q + MODULO_Q : KA % MODULO_Q;
     }
-
 
     //Find Bobs Key
     KB = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KB = abs((KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q);
+      KB = (KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q;
+      KB = (KB < 0) ? KB % MODULO_Q + MODULO_Q : KB % MODULO_Q;
     }
 
-
   }
-  */
+
   //Obtain a signal
-  int sig = signal_function(KB, 0);
+  int sig = signal_function(KB, rand()%2);
   //-- Obtain shared keys between Alice and Bob ----
   int SKA = robust_extractor(KA, sig);
   int SKB = robust_extractor(KB, sig);
@@ -154,7 +154,6 @@ int *generate_gaussian_vector(){
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
     gauss_vec[i] = discrete_normal_distribution(mu,sigma);
-    printf("gauss_vec[%i] = %i\n", i, gauss_vec[i]);
   }
 
   return gauss_vec;
@@ -162,7 +161,7 @@ int *generate_gaussian_vector(){
 
 int generate_gaussian_scalar(){
   int mu = 0;
-  int sigma = 1;
+  int sigma = LATTICE_DIMENSION;
   return discrete_normal_distribution(mu,sigma);
 }
 
@@ -172,32 +171,17 @@ int robust_extractor(int x, int sigma){
 
 bool check_robust_extractor(int x, int y){
   double delta = MODULO_Q/4 - 2;
-
-  if((x-y)%2 == 0 && abs(x-y) <= delta){
-    return true;
-  }
-  else{
-    return false;
-  }
-
+  return ((x-y)%2 == 0 && abs(x-y) <= delta);
 }
 
 int signal_function(int y, int b){
-  if(b == 0){
-    if(y >= (double)-MODULO_Q/4 && y <= (double)MODULO_Q/4){
-      return 0;
-    }
-    else{
-      return 1;
-    }
-  }
-  else if(b == 1){
-    if(y >= (double)-MODULO_Q/4 + 1 && y <= (double)MODULO_Q/4 + 1){
-      return 0;
-    }
-    else{
-      return 1;
-    }
+  return !(y >= (double)-MODULO_Q/4 + b && y <= (double)MODULO_Q/4 + b);
+}
+
+void pretty_print_vector(int *vec){
+  int i = 0;
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    printf("%i\n", vec[i]);
   }
 }
 
