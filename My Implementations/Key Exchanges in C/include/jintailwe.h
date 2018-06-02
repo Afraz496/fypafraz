@@ -48,6 +48,8 @@ void generate_M();
 
 long discrete_normal_distribution(int mean, int sigma);
 
+//*******Print functions****//
+void pretty_print_vector(int *vec);
 /*---------------------------End of Function Prototypes-----------------------*/
 
 #endif
