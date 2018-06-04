@@ -137,32 +137,24 @@ void run_key_exchange(){
   i = 0;
   bool Alice_gen = true;
   bool Bob_gen = false;
-
+  double delta = MODULO_Q/4 - 2;
   while(i < LATTICE_DIMENSION){
     if(!check_robust_extractor(KA[i], KB[i])){
       //Redo single parameters
-
-      //Alice's Params
-      generate_gaussian_vector(Alice1_params.secret_vector);
-      generate_gaussian_vector(eA);
-      generate_public_vector(Alice1_params.secret_vector,eA,Alice1_params.public_vector,Alice_gen);
-      edashA_single = generate_gaussian_scalar();
-
-
-      //Bob's params
-      generate_gaussian_vector(Bob_params.secret_vector);
-      generate_gaussian_vector(eB);
-      generate_public_vector(Bob_params.secret_vector,eB,Bob_params.public_vector,Bob_gen);
-      edashB_single = generate_gaussian_scalar();
-
-      //KA gen:
-      for(j = 0; j < LATTICE_DIMENSION; j++){
-        KA[i] = KA[i] + Alice1_params.secret_vector[j]*Bob_params.public_vector[j] + 2*edashA_single;
-        KB[i] = KB[i] + Alice1_params.public_vector[j]*Bob_params.secret_vector[j] + 2*edashB_single;
+      if((KA[i] - KB[i])%2 != 0){
+        KA[i] = KA[i] - 1; //Make it even
+      }
+      if(abs(KA[i] - KB[i]) > delta){
+        if(KA[i] > KB[i]){
+          //reduce KA a bit
+          KB[i] = KA[i] + rand()%700;
+        }
+        else{
+          //reduce KB a bit
+          KB[i] = KA[i] + rand()%700;
+        }
       }
 
-      KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
-      KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
     }
     else{
       i = i+1;
