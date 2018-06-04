@@ -21,12 +21,15 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "omp.h"
+#include <omp.h>
 
 #include "jintailwe.h"
 #include "dgs.h"
 
+dgs_disc_gauss_dp_t *D;
+
 int main(){
+  D = dgs_disc_gauss_dp_init(LATTICE_DIMENSION,0,6,DGS_DISC_GAUSS_UNIFORM_TABLE);
   /************ Allocate Temporary Memory on the Fly **************************/
   uint16_t i, j;
   //Alice Memory Allocation
@@ -73,12 +76,7 @@ void run_key_exchange(){
   generate_M();
   int i, j; // loop index
   //------- Generate Alices parameters --------
-  time_t t;
-  t = clock();
   generate_gaussian_matrix(Alice_params.secret_matrix);
-  t = clock() - t;
-  double time_taken = ((double)t)/CLOCKS_PER_SEC;
-  printf("Alice Matrix took: %f\n", time_taken);
   generate_gaussian_matrix(EA);
 
   /*
@@ -94,6 +92,7 @@ void run_key_exchange(){
       Alice_params.public_matrix[i][j] = (Alice_params.public_matrix[i][j] < 0) ? Alice_params.public_matrix[i][j] % MODULO_Q + MODULO_Q : Alice_params.public_matrix[i][j] % MODULO_Q;
     }
   }
+
 
   generate_gaussian_vector(edashA);
 
@@ -128,7 +127,6 @@ void run_key_exchange(){
       KB[i] = KB[i] + Alice_params.public_matrix[j][i]*Bob_params.secret_vector[j] + 2*edashB[j];
     }
     KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
-    printf("%i\n", KB[i]);
   }
 
 
@@ -136,7 +134,6 @@ void run_key_exchange(){
 
 
   //-- Check the robust extractor condition till correct params generated ----
-  /*
   i = 0;
   bool Alice_gen = true;
   bool Bob_gen = false;
@@ -171,7 +168,6 @@ void run_key_exchange(){
       i = i+1;
     }
   }
-  */
 
   //Shared Keys
   for(i = 0; i < LATTICE_DIMENSION; i++){
@@ -232,31 +228,24 @@ void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, boo
 
 //This function is broken for the globals
 void generate_gaussian_matrix(int **gauss_matrix){
-  int mu = 0;
 
-  int sigma = 512;
-  #pragma omp parallel for num_threads(4) collapse(2)
-  for(int i = 0; i < 512; i++){
-    for(int j = 0; j < 512; j++){
-      gauss_matrix[i][j] = discrete_normal_distribution(mu,sigma);
+  //#pragma omp parallel for collapse(2)
+  for(int i = 0; i < LATTICE_DIMENSION; i++){
+    for(int j = 0; j < LATTICE_DIMENSION; j++){
+      gauss_matrix[i][j] = discrete_normal_distribution();
     }
   }
 }
 
 void generate_gaussian_vector(int gauss_vec[LATTICE_DIMENSION]){
   int i; //Loop index
-  int mu = 0;
-  int sigma = LATTICE_DIMENSION;
-
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    gauss_vec[i] = discrete_normal_distribution(mu,sigma);
+    gauss_vec[i] = discrete_normal_distribution();
   }
 }
 
 int generate_gaussian_scalar(){
-  int mu = 0;
-  int sigma = 1;
-  return discrete_normal_distribution(mu,sigma);
+  return discrete_normal_distribution();
 }
 
 int robust_extractor(int x, int sigma){
@@ -291,8 +280,7 @@ void pretty_print_vector(int vec[LATTICE_DIMENSION]){
 /*------------------- Generate Gaussian numbers in C -------------------------*/
 
 //Makes use of the dgs library
-long discrete_normal_distribution(int mean, int sigma){
-  uint8_t tau = 6;
-  dgs_disc_gauss_dp_t *D = dgs_disc_gauss_dp_init(sigma,mean,tau,DGS_DISC_GAUSS_UNIFORM_TABLE);
-  return D->call(D);
+inline long discrete_normal_distribution(){
+  long val = D->call(D);
+  return val;
 }

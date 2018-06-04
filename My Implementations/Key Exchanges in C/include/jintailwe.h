@@ -86,7 +86,7 @@ extern void generate_M();
 
 
 //------------------ Generate gaussian numbers in C ----------------------------
-extern long discrete_normal_distribution(int mean, int sigma);
+extern inline long discrete_normal_distribution();
 
 /*---------------------------End of Function Prototypes-----------------------*/
 
