@@ -67,7 +67,11 @@ int main(){
 
   //Signal Memory Allocation
   sig =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
+  time_t t = clock();
   run_key_exchange();
+  t = clock() - t;
+  double time_taken = ((double)t)/CLOCKS_PER_SEC;
+  printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
   return 0;
 }
 
@@ -179,6 +183,12 @@ void run_key_exchange(){
 
   if(kex_success){
     printf("Key Exchange worked, Alice and Bob Share the same key!\n");
+    printf("Alice's key is:\n");
+    pretty_print_vector(SKA);
+    printf("\n");
+    printf("Bob's key is:\n");
+    pretty_print_vector(SKB);
+    printf("\n");
   }
 
 }
@@ -266,7 +276,7 @@ void pretty_print_matrix(int **matrix){
 void pretty_print_vector(int vec[LATTICE_DIMENSION]){
   int i;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    printf("Vector[%i] = %i\n",i, vec[i]);
+    printf("%i", vec[i]);
   }
 }
 /*------------------- Generate Gaussian numbers in C -------------------------*/
