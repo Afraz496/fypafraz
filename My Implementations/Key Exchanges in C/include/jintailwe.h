@@ -76,8 +76,6 @@ extern bool check_robust_extractor(int x, int y); // Condition for the validity 
 
 extern int signal_function(int y, int b); // A hint algorithm
 
-extern void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, bool client); //Single Vector Public in case of resampling
-
 //----- Printing functions-----
 extern void pretty_print_vector(int vec[LATTICE_DIMENSION]); //Prints a vector
 extern void pretty_print_matrix(int **matrix); //Prints a matrix

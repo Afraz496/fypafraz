@@ -69,9 +69,11 @@ int main(){
   sig =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   time_t t = clock();
   run_key_exchange();
+
   t = clock() - t;
   double time_taken = ((double)t)/CLOCKS_PER_SEC;
   printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+
   return 0;
 }
 
@@ -145,17 +147,18 @@ void run_key_exchange(){
   while(i < LATTICE_DIMENSION){
     if(!check_robust_extractor(KA[i], KB[i])){
       //Redo single parameters
+      long offset = discrete_normal_distribution();
       if((KA[i] - KB[i])%2 != 0){
         KA[i] = KA[i] - 1; //Make it even
       }
       if(abs(KA[i] - KB[i]) > delta){
         if(KA[i] > KB[i]){
           //reduce KA a bit
-          KB[i] = KA[i] + rand()%700;
+          KB[i] = KA[i] + offset;
         }
         else{
           //reduce KB a bit
-          KB[i] = KA[i] + rand()%700;
+          KB[i] = KA[i] + offset;
         }
       }
 
@@ -172,23 +175,26 @@ void run_key_exchange(){
     SKB[i] = robust_extractor(KB[i], sig[i]);
   }
 
+  /******* RESULTS **********/
+
   bool kex_success = true;
   //--- Check if the keys are the same ---
   for(i = 0;i < LATTICE_DIMENSION; i++){
     if(SKA[i] != SKB[i]){
-      printf("%i\n", i);
       kex_success = false;
     }
   }
 
   if(kex_success){
     printf("Key Exchange worked, Alice and Bob Share the same key!\n");
+    /*
     printf("Alice's key is:\n");
     pretty_print_vector(SKA);
     printf("\n");
     printf("Bob's key is:\n");
     pretty_print_vector(SKB);
     printf("\n");
+    */
   }
 
 }
@@ -204,29 +210,6 @@ void generate_M(){
     }
   }
 }
-
-void generate_public_vector(int* secret_vec, int*error_vec, int* public_vec, bool client){
-  uint16_t i, j;
-
-  if(!client){
-
-    for(i = 0;i < LATTICE_DIMENSION; i++){
-      for(j = 0; j < LATTICE_DIMENSION; j++){
-          public_vec[i] = public_vec[i] + M_TRANSPOSE[i][j]*secret_vec[j] + 2*error_vec[j];
-        }
-        public_vec[i] = (public_vec[i] < 0) ? public_vec[i] % MODULO_Q + MODULO_Q : public_vec[i] % MODULO_Q;
-      }
-  }
-  else{
-    for(i = 0;i < LATTICE_DIMENSION; i++){
-      for(j = 0; j < LATTICE_DIMENSION; j++){
-          public_vec[i] = public_vec[i] + M[i][j]*secret_vec[j] + 2*error_vec[j];
-        }
-        public_vec[i] = (public_vec[i] < 0) ? public_vec[i] % MODULO_Q + MODULO_Q : public_vec[i] % MODULO_Q;
-      }
-  }
-}
-
 
 //This function is broken for the globals
 void generate_gaussian_matrix(int **gauss_matrix){

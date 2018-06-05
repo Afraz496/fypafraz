@@ -5,7 +5,7 @@ for((i=0; i<$number; i+=1)); do
   output=$(./jintailwe)
   size=${#output}
   if [ $size -gt 0 ]; then
-    echo "SUCCESS"
+    echo "SUCCESS ""$output"""
     success=$((success+1))
   else
     echo "FAILED"
