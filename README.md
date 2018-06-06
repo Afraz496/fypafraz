@@ -78,6 +78,20 @@ As referred to in the introduction section this is based on a simple key exchang
 
 `$ python simplekeyexchange.py`
 
+This protocol can now partake in n-bit security. In the python script the parameter 'n' in the main() function represents the lattice dimension, it can be changed to increase the brute force security. Currently the lattice dimension is set to 512. 
+
+## Test Results
+
+If you are interested in individual parameters and the total execution time of the program there is an already available script specifically designed to find the average of all the printed output of 'simplekeyexchange.py' and this script also plots a graph of the exeuction time for 'n' points. 
+
+To make use of this test-suite first type:
+
+`$ ./runsimplekexntimes.sh 100 > simplekexresults.txt` (if you want 100 results)
+
+Then simply type:
+
+`$ python graphresults.py`
+
 Instead of running the key exchange once there is a shell script included to run the key exchange 'n' times. It can be used as:
 
 `$ ./runsimplekexntimes n` <----- Here n specifies the number of times the key exchange runs before the program terminates.
@@ -87,3 +101,4 @@ If you are using a Unix based system you will need to make the shell script exec
 `$ chmod u+x runsimplekexntimes`
 
 If you wish to terminate execution on Linux or Unix you can use the Ctrl+X command to terminate the script.
+
