@@ -132,8 +132,8 @@ def run_key_exchange(n,q):
     end_time = datetime.datetime.now()
     print_time((end_time-start_time).total_seconds(), "KA and KB took ")
     #---------ensuring Robust extractor property is preserved--------
-
     start_time = datetime.datetime.now()
+
     i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
 
@@ -144,6 +144,7 @@ def run_key_exchange(n,q):
             pB,sB = generate_bob_params(M,n,q)
             edash_single_A = generate_gaussian_scalar()
             edash_single_B = generate_gaussian_scalar()
+
 
             #Get KA[i]
             KA[i] = (numpy.transpose(sA).dot(pB) + 2*edash_single_A)%q
