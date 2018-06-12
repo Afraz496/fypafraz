@@ -6,7 +6,7 @@ This README is a short introduction on the organisation of the software that com
 
 - **My Implementations**: This is the main folder which includes the following subfolder + files:
   - **Key Exchanges in C**: This includes files organised as an include and src C program which can all be compiled using the Makefile in src.
-    -**jintailwe.c**: This is the main key exchange file, it holds most of the relevant functions and simulates a key exchange between Alice and Bob, it also includes Key Construction and parameter generation with modifiable parameters available in the header file.
+    - **jintailwe.c**: This is the main key exchange file, it holds most of the relevant functions and simulates a key exchange between Alice and Bob, it also includes Key Construction and parameter generation with modifiable parameters available in the header file.
   - **simplekeyexchange.py**: This is a python script which runs the D-H like Key Exchange for multiple-bits.
   - **graphresults.py**: This file is a python script which delimits, segregates and averages the output obtained from a .txt file after running the key exchange from the python script in 'My Implementations.'
 - **Parameter Selection**: This includes a python script to remark on the parameters used for the key exchange namely `n` and `q` based on Lemma 4 in the paper. 
