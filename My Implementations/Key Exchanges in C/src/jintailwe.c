@@ -144,6 +144,7 @@ void run_key_exchange(){
   bool Alice_gen = true;
   bool Bob_gen = false;
   double delta = MODULO_Q/4 - 2;
+  
   while(i < LATTICE_DIMENSION){
     if(!check_robust_extractor(KA[i], KB[i])){
       //Redo single parameters
@@ -234,7 +235,7 @@ int generate_gaussian_scalar(){
 }
 
 int robust_extractor(int x, int sigma){
-  return ((((int)x)%MODULO_Q + (int64_t)(sigma * (MODULO_Q)/2)%MODULO_Q)%2);
+  return ((((int)x)%MODULO_Q + (int64_t)(sigma * (MODULO_Q - 1)/2)%MODULO_Q)%2);
 }
 
 bool check_robust_extractor(int x, int y){
