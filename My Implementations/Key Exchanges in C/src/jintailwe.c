@@ -144,7 +144,7 @@ void run_key_exchange(){
   bool Alice_gen = true;
   bool Bob_gen = false;
   double delta = MODULO_Q/4 - 2;
-  
+
   while(i < LATTICE_DIMENSION){
     if(!check_robust_extractor(KA[i], KB[i])){
       //Redo single parameters
@@ -244,7 +244,7 @@ bool check_robust_extractor(int x, int y){
 }
 
 int signal_function(int y, int b){
-  return !(y >= (double)-MODULO_Q/4 + b && y <= (double)MODULO_Q/4 + b);
+  return !(y >= floor(-MODULO_Q/4) + b && y <= floor(MODULO_Q/4) + b);
 }
 
 void pretty_print_matrix(int **matrix){
