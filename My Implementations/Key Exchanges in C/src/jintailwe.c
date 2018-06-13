@@ -62,21 +62,29 @@ void run_key_exchange(){
   int edashA = generate_gaussian_scalar();
   int edashB = generate_gaussian_scalar();
 
+  int KA;
+  int KB;
   //Find Alices Key
-
-  int KA = 0;
+  KA = 0;
+  //Find sA*pB
+  int temp;
+  temp = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KA = KA + (sA[i]*pB[i] + 2*edashA);
-    KA = (KA < 0) ? KA % MODULO_Q + MODULO_Q : KA % MODULO_Q;
+    temp = (temp + (sA[i]*pB[i]));
   }
+
+  KA =  (temp + 2*edashA)%MODULO_Q;
+  KA = (KA < 0) ? KA % MODULO_Q + MODULO_Q : KA % MODULO_Q;
 
   //Find Bobs Key
-
-  int KB = 0;
+  KB = 0;
+  temp = 0;
   for(i = 0; i < LATTICE_DIMENSION; i++){
-    KB = KB + (pA[i]*sB[i] + 2*edashB);
-    KB = (KB < 0) ? KB % MODULO_Q + MODULO_Q : KB % MODULO_Q;
+    temp = (temp + (sB[i]*pA[i]));
   }
+
+  KB =  (temp + 2*edashB)%MODULO_Q;
+  KB = (KB < 0) ? KB % MODULO_Q + MODULO_Q : KB % MODULO_Q;
 
   //-- Check the robust extractor condition till correct params generated ----
   while(!check_robust_extractor(KA,KB)){
@@ -103,24 +111,30 @@ void run_key_exchange(){
     edashA = generate_gaussian_scalar();
     edashB = generate_gaussian_scalar();
 
-    //TODO: KA and KB are negative, revise logic
-
     //Find Alices Key
     KA = 0;
+    //Find sA*pB
+    int temp;
+    temp = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KA = (KA + (sA[i]*pB[i] + 2*edashA))%MODULO_Q;
-      KA = (KA < 0) ? KA % MODULO_Q + MODULO_Q : KA % MODULO_Q;
+      temp = (temp + (sA[i]*pB[i]));
+      temp = (temp < 0) ? temp % MODULO_Q + MODULO_Q : temp % MODULO_Q;
     }
+
+    KA =  (temp + 2*edashA)%MODULO_Q;
 
     //Find Bobs Key
     KB = 0;
+    temp = 0;
     for(i = 0; i < LATTICE_DIMENSION; i++){
-      KB = (KB + (pA[i]*sB[i] + 2*edashB))%MODULO_Q;
-      KB = (KB < 0) ? KB % MODULO_Q + MODULO_Q : KB % MODULO_Q;
+      temp = (temp + (sB[i]*pA[i]));
+      temp = (temp < 0) ? temp % MODULO_Q + MODULO_Q : temp % MODULO_Q;
     }
 
-  }
+    KA =  (temp + 2*edashB)%MODULO_Q;
 
+  }
+  
   //Obtain a signal
   int sig = signal_function(KB, rand()%2);
   //-- Obtain shared keys between Alice and Bob ----
