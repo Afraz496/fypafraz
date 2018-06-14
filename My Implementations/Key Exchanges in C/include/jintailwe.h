@@ -16,6 +16,7 @@
  */
 
 #include <stdbool.h>
+#include "dgs.h"
 
 #ifndef HEADER_JINTAILWE_H
 
@@ -45,24 +46,28 @@ int *edashA; //Alices other error vector
 int *KA;
 int *SKA;
 
-//----Resampling----
-int *eA; // in case of resampling
-int edashA_single; //for single bit value of KA
-
 //Bob Params
 int *eB; //Bobs Error vector
 int *edashB; //Bobs Error Scalar
 int *KB;
 int *SKB;
 
-//----Resampling----
-int edashB_single; //for single bit value of KB
-
 //Signal generated
 int *sig; //either 0 or 1 at any index
 
+//-----DGS-----//
+dgs_disc_gauss_dp_t *D;
+
+//------TEST RESULTS-----//
+int vector_mem = (LATTICE_DIMENSION*sizeof(int));
+int matrix_mem = (LATTICE_DIMENSION*LATTICE_DIMENSION*sizeof(int));
+
+int Alice0_mem_vector = 1; //edashA
+int Alice0_mem_matrix = 3; //SA, EA, PA
+int Bob_mem_vector = 6; //sB, eB, edashB, pB, KB, sigma
+int Alice1_mem_vector = 2;
 /*------------------------------Function Prototypes---------------------------*/
-extern void run_key_exchange(); //Running the key exchange protocol based on public params
+extern void run_key_exchange(int argc, char **argv); //Running the key exchange protocol based on public params
 
 extern void generate_gaussian_matrix(); // Generate a matrix sampled from the Discrete Gaussian distribution
 
@@ -79,6 +84,10 @@ extern int signal_function(int y, int b); // A hint algorithm
 //----- Printing functions-----
 extern void pretty_print_vector(int vec[LATTICE_DIMENSION]); //Prints a vector
 extern void pretty_print_matrix(int **matrix); //Prints a matrix
+
+//----- Test Result Functions --
+extern void memory_consumed();
+
 //------------------ Public Parameters for the key Exchange -------------------
 extern void generate_M();
 

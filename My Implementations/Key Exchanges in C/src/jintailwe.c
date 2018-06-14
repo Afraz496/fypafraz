@@ -20,15 +20,14 @@
 #include <time.h>
 #include <stdbool.h>
 #include <math.h>
+#include <string.h>
 
 #include <omp.h>
 
 #include "jintailwe.h"
 #include "dgs.h"
 
-dgs_disc_gauss_dp_t *D;
-
-int main(){
+int main(int argc, char **argv){
   D = dgs_disc_gauss_dp_init(LATTICE_DIMENSION,0,6,DGS_DISC_GAUSS_UNIFORM_TABLE);
   /************ Allocate Temporary Memory on the Fly **************************/
   uint16_t i, j;
@@ -55,7 +54,6 @@ int main(){
   //Resampling for Alice:
   Alice1_params.secret_vector =     (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   Alice1_params.public_vector =     (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
-  eA =                              (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
 
   //Bob Memory Allocation
   Bob_params.secret_vector = (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
@@ -68,16 +66,55 @@ int main(){
   //Signal Memory Allocation
   sig =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   time_t t = clock();
-  run_key_exchange();
-
+  if(argc >= 2){
+    if(strcmp(argv[1],"--help")!=0){
+      run_key_exchange(argc,argv);
+    }
+  }
+  else{
+    run_key_exchange(argc,argv);
+  }
   t = clock() - t;
   double time_taken = ((double)t)/CLOCKS_PER_SEC;
-  printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+  if(argc >= 2){
+    if(strcmp(argv[1],"--results")==0){
+      printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+      memory_consumed();
+    }
+    if(strcmp(argv[1],"--time")==0){
+      printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+    }
+    if(strcmp(argv[1],"--mem")==0){
+      memory_consumed();
+    }
+    if(strcmp(argv[1],"-help")==0){
+      printf("COPYRIGHT: Afraz Arif Khan 2018, This software is available under the MIT 2.0 License\n");
+      printf("=====================================================================================\n");
+      printf("This is a Lattice Cryptography LWE Post-Quantum Key Exchange\n");
+      printf("\n\n");
+      printf("To view all the results including time and memory complexity type:\n");
+      printf("./jintailwe --results\n");
+      printf("\n");
+      printf("To view all the total time taken for the key exchange:\n");
+      printf("./jintailwe --time\n");
+      printf("\n");
+      printf("To view all the memory consumed by M, Alice0, Bob and Alice1 for the key exchange:\n");
+      printf("./jintailwe --mem\n");
+      printf("\n");
+      printf("To view Alice and Bobs Shared Keys:\n");
+      printf("./jintailwe --print-keys\n");
+    }
+  }
+
+
+  if(argc < 2){
+    printf("Type './jintailwe -help' for further instructions\n");
+  }
 
   return 0;
 }
 
-void run_key_exchange(){
+void run_key_exchange(int argc, char **argv){
   srand(time(NULL));
   generate_M();
   int i, j; // loop index
@@ -188,16 +225,18 @@ void run_key_exchange(){
 
   if(kex_success){
     printf("Key Exchange worked, Alice and Bob Share the same key!\n");
-    /*
-    printf("Alice's key is:\n");
-    pretty_print_vector(SKA);
-    printf("\n");
-    printf("Bob's key is:\n");
-    pretty_print_vector(SKB);
-    printf("\n");
-    */
   }
 
+  if(argc >= 2){
+    if(strcmp(argv[1],"--print-keys")==0){
+      printf("Alice's Key is:\n");
+      pretty_print_vector(SKA);
+      printf("\n");
+      printf("Bob's key is:\n");
+      pretty_print_vector(SKB);
+      printf("\n");
+    }
+  }
 }
 
 //Generating the public matrix M once and for all
@@ -266,7 +305,15 @@ void pretty_print_vector(int vec[LATTICE_DIMENSION]){
 /*------------------- Generate Gaussian numbers in C -------------------------*/
 
 //Makes use of the dgs library
-inline long discrete_normal_distribution(){
+long discrete_normal_distribution(){
   long val = D->call(D);
   return val;
+}
+
+/*---------------------------- Test Results ----------------------------------*/
+void memory_consumed(){
+  printf("It took %i bytes to generate M\n", matrix_mem);
+  printf("It took %i bytes for Alice0\n", Alice0_mem_vector*vector_mem + Alice0_mem_matrix*matrix_mem);
+  printf("It took %i bytes for Bob\n", Bob_mem_vector*vector_mem);
+  printf("It took %i bytes for Alice1\n", Alice1_mem_vector*vector_mem);
 }
