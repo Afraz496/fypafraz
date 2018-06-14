@@ -67,7 +67,7 @@ int main(int argc, char **argv){
   sig =                      (int*)malloc(sizeof(int)*LATTICE_DIMENSION);
   time_t t = clock();
   if(argc >= 2){
-    if(strcmp(argv[1],"--help")!=0){
+    if(strcmp(argv[1],"-help")!=0){
       run_key_exchange(argc,argv);
     }
   }
