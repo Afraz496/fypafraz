@@ -78,11 +78,14 @@ int main(int argc, char **argv){
   double time_taken = ((double)t)/CLOCKS_PER_SEC;
   if(argc >= 2){
     if(strcmp(argv[1],"--results")==0){
-      printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+      printf("The total time taken for the key exchange is: %fms\n",time_taken*1000 );
+      printf("\n");
+      printf("=============Communicational Complexity Benchmark================\n" );
+      printf("\n");
       memory_consumed();
     }
-    if(strcmp(argv[1],"--time")==0){
-      printf("The total time taken for the key exchange is: %f seconds\n",time_taken );
+    if(strcmp(argv[1],"--time")==0 || strcmp(argv[1],"--time-params")==0){
+      printf("The total time taken for the key exchange is: %fms\n",time_taken*1000 );
     }
     if(strcmp(argv[1],"--mem")==0){
       memory_consumed();
@@ -97,6 +100,9 @@ int main(int argc, char **argv){
       printf("\n");
       printf("To view all the total time taken for the key exchange:\n");
       printf("./jintailwe --time\n");
+      printf("\n");
+      printf("To view the total time taken for the key exchange and individual processes:\n");
+      printf("./jintailwe --time-params\n");
       printf("\n");
       printf("To view all the memory consumed by M, Alice0, Bob and Alice1 for the key exchange:\n");
       printf("./jintailwe --mem\n");
@@ -115,10 +121,22 @@ int main(int argc, char **argv){
 }
 
 void run_key_exchange(int argc, char **argv){
+  double time_taken_M;
+  double time_taken_Alice0;
+  double time_taken_Bob;
+  double time_taken_Alice1;
+  double time_taken_temp;
   srand(time(NULL));
+
+  time_t t = clock();
   generate_M();
+  t = clock() - t;
+  time_taken_M = ((double)t)/CLOCKS_PER_SEC;
+
   int i, j; // loop index
+
   //------- Generate Alices parameters --------
+  t = clock();
   generate_gaussian_matrix(Alice_params.secret_matrix);
   generate_gaussian_matrix(EA);
 
@@ -138,9 +156,10 @@ void run_key_exchange(int argc, char **argv){
 
 
   generate_gaussian_vector(edashA);
-
+  t = clock() - t;
+  time_taken_Alice0 = ((double)t)/CLOCKS_PER_SEC;
   //------- Generate Bobs parameters ----------
-
+  t = clock();
   generate_gaussian_vector(Bob_params.secret_vector);
   generate_gaussian_vector(eB);
   generate_gaussian_vector(edashB);
@@ -153,16 +172,6 @@ void run_key_exchange(int argc, char **argv){
     Bob_params.public_vector[i] = (Bob_params.public_vector[i] < 0) ? Bob_params.public_vector[i] % MODULO_Q + MODULO_Q : Bob_params.public_vector[i] % MODULO_Q;
   }
 
-
-  //Find Alices Key
-  for(i = 0; i < LATTICE_DIMENSION; i++){
-    for(j = 0; j < LATTICE_DIMENSION; j++){
-      KA[i] = KA[i] + Alice_params.secret_matrix[j][i]*Bob_params.public_vector[j] + 2*edashA[j];
-    }
-    KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
-  }
-
-
   //Find Bobs Key
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
@@ -172,9 +181,19 @@ void run_key_exchange(int argc, char **argv){
     KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
   }
 
+  t = clock() - t;
+  time_taken_Bob = ((double)t)/CLOCKS_PER_SEC;
 
-
-
+  t = clock();
+  //Find Alices Key
+  for(i = 0; i < LATTICE_DIMENSION; i++){
+    for(j = 0; j < LATTICE_DIMENSION; j++){
+      KA[i] = KA[i] + Alice_params.secret_matrix[j][i]*Bob_params.public_vector[j] + 2*edashA[j];
+    }
+    KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
+  }
+  t = clock() - t;
+  time_taken_Alice1 = ((double)t)/CLOCKS_PER_SEC;
 
   //-- Check the robust extractor condition till correct params generated ----
   i = 0;
@@ -206,12 +225,17 @@ void run_key_exchange(int argc, char **argv){
     }
   }
 
+  t = clock();
   //Shared Keys
   for(i = 0; i < LATTICE_DIMENSION; i++){
     sig[i] = signal_function(KB[i], rand()%2);
     SKA[i] = robust_extractor(KA[i], sig[i]);
     SKB[i] = robust_extractor(KB[i], sig[i]);
   }
+  t = clock()-t;
+  time_taken_temp = ((double)t)/CLOCKS_PER_SEC;
+  time_taken_Bob = time_taken_Bob + (2/3)*time_taken_temp;
+  time_taken_Alice1 = time_taken_Alice1 + (1/3)*time_taken_temp;
 
   /******* RESULTS **********/
 
@@ -235,6 +259,18 @@ void run_key_exchange(int argc, char **argv){
       printf("Bob's key is:\n");
       pretty_print_vector(SKB);
       printf("\n");
+    }
+    if(strcmp(argv[1],"--time-params")==0 || strcmp(argv[1],"--results")==0){
+      printf("============= Time taken for individual parameters ==============\n" );
+      printf("\n");
+      printf(" --------- | -------------\n" );
+      printf("|parameter | Time(ms)       \n" );
+      printf(" --------  | -------------\n" );
+      printf("| M        | %f\n", time_taken_M*1000);
+      printf("| Alice0   | %f\n", time_taken_Alice0*1000);
+      printf("| Bob      | %f\n", time_taken_Bob*1000);
+      printf("| Alice1   | %f\n", time_taken_Alice1*1000);
+      printf(" --------  | -------------\n" );
     }
   }
 }
@@ -312,8 +348,12 @@ long discrete_normal_distribution(){
 
 /*---------------------------- Test Results ----------------------------------*/
 void memory_consumed(){
-  printf("It took %i bytes to generate M\n", matrix_mem);
-  printf("It took %i bytes for Alice0\n", Alice0_mem_vector*vector_mem + Alice0_mem_matrix*matrix_mem);
-  printf("It took %i bytes for Bob\n", Bob_mem_vector*vector_mem);
-  printf("It took %i bytes for Alice1\n", Alice1_mem_vector*vector_mem);
+  printf(" --------- | -------------\n" );
+  printf("|parameter | bytes        \n" );
+  printf(" --------  | -------------\n" );
+  printf("| M        | %i           \n", matrix_mem);
+  printf("| Alice0   | %i           \n", Alice0_mem_vector*vector_mem + Alice0_mem_matrix*matrix_mem);
+  printf("| Bob      | %i           \n", Bob_mem_vector*vector_mem);
+  printf("| Alice1   | %i           \n", Alice1_mem_vector*vector_mem);
+  printf(" --------- | -------------\n" );
 }
