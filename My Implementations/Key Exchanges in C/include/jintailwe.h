@@ -20,7 +20,7 @@
 
 #ifndef HEADER_JINTAILWE_H
 
-#define LATTICE_DIMENSION 728 // Matrix Dimension
+#define LATTICE_DIMENSION 752 // Matrix Dimension
 #define MODULO_Q 2147483647 // q - The modulo factor
 
 struct vector_params{
@@ -87,6 +87,7 @@ extern void pretty_print_matrix(int **matrix); //Prints a matrix
 
 //----- Test Result Functions --
 extern void memory_consumed();
+extern void communication_complexity();
 
 //------------------ Public Parameters for the key Exchange -------------------
 extern void generate_M();

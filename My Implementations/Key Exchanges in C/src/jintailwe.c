@@ -80,9 +80,13 @@ int main(int argc, char **argv){
     if(strcmp(argv[1],"--results")==0){
       printf("The total time taken for the key exchange is: %fms\n",time_taken*1000 );
       printf("\n");
-      printf("=============Communicational Complexity Benchmark================\n" );
+      printf("==================Memory Complexity Benchmark=====================\n" );
       printf("\n");
       memory_consumed();
+      printf("==============Communicational Complexity Benchmark================\n" );
+      printf("\n");
+      communication_complexity();
+
     }
     if(strcmp(argv[1],"--time")==0 || strcmp(argv[1],"--time-params")==0){
       printf("The total time taken for the key exchange is: %fms\n",time_taken*1000 );
@@ -176,7 +180,7 @@ void run_key_exchange(int argc, char **argv){
 
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      KB[i] = KB[i] + Alice_params.public_matrix[j][i]*Bob_params.secret_vector[j] + 2*edashB[j];
+      KB[i] = KB[i] + (Alice_params.public_matrix[j][i]*Bob_params.secret_vector[j] + 2*edashB[j])%MODULO_Q;
     }
     KB[i] = (KB[i] < 0) ? KB[i] % MODULO_Q + MODULO_Q : KB[i] % MODULO_Q;
   }
@@ -188,7 +192,7 @@ void run_key_exchange(int argc, char **argv){
   //Find Alices Key
   for(i = 0; i < LATTICE_DIMENSION; i++){
     for(j = 0; j < LATTICE_DIMENSION; j++){
-      KA[i] = KA[i] + Alice_params.secret_matrix[j][i]*Bob_params.public_vector[j] + 2*edashA[j];
+      KA[i] = KA[i] + (Alice_params.secret_matrix[j][i]*Bob_params.public_vector[j] + 2*edashA[j])%MODULO_Q;
     }
     KA[i] = (KA[i] < 0) ? KA[i] % MODULO_Q + MODULO_Q : KA[i] % MODULO_Q;
   }
@@ -355,5 +359,14 @@ void memory_consumed(){
   printf("| Alice0   | %i           \n", Alice0_mem_vector*vector_mem + Alice0_mem_matrix*matrix_mem);
   printf("| Bob      | %i           \n", Bob_mem_vector*vector_mem);
   printf("| Alice1   | %i           \n", Alice1_mem_vector*vector_mem);
+  printf(" --------- | -------------\n" );
+}
+
+void communication_complexity(){
+  printf(" --------- | -------------\n" );
+  printf("|   Communication(bytes)  \n" );
+  printf(" --------- | -------------\n" );
+  printf("|  A -> B  | %i           \n", matrix_mem );
+  printf("|  B -> A  | %i           \n", 2*vector_mem );
   printf(" --------- | -------------\n" );
 }
