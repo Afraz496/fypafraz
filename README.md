@@ -87,8 +87,8 @@ Remark: gcc-5 is the version I have installed, yours might differ."
 
 #### Linux
 
-`$ sudo apt-get install gmp`
-`$ sudo apt-get install mpfr`
+`$ sudo apt-get install libgmp3-dev`
+`$ sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg`
 `$ sudo apt install libomp-dev`
 
 ## Usage
