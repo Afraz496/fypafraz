@@ -115,10 +115,10 @@ def run_key_exchange(n,q):
     edashA = generate_gaussian_vector(n)
     end_time = datetime.datetime.now()
     Alice0_time = (end_time-start_time).total_seconds()
+
     start_time = datetime.datetime.now()
     pB,sB = generate_bob_params(M,n,q)
     edashB = 2 * generate_gaussian_vector(n)
-
 
     #Setup variables to reduce complexity
     m_dot = numpy.transpose(M).dot(sB)
@@ -127,6 +127,10 @@ def run_key_exchange(n,q):
 
     #Generate the Keys
     KB = ((sa_transpose.dot(m_dot) + (ea_transpose.dot(sB))) + edashB) % q
+    end_time = datetime.datetime.now()
+    Bob_time = (end_time-start_time).total_seconds()
+
+    start_time = datetime.datetime.now()
     KA = (numpy.transpose(SA).dot(pB) + 2*edashA)%q
     #---------ensuring Robust extractor property is preserved--------
 
@@ -150,9 +154,6 @@ def run_key_exchange(n,q):
             i += 1
 
     signal = generate_signal(n, KB, q)
-    end_time = datetime.datetime.now()
-    Bob_time = (end_time-start_time).total_seconds()
-    start_time = datetime.datetime.now()
     #---------------Generating shared keys------
     SKA = []
     SKB = []
@@ -201,10 +202,10 @@ def run_key_exchange(n,q):
             print "============================================"
             print "|     Parameter   |      Time(ms)           "
             print "============================================"
-            print "|        M        |       %f                " %(M_time*1000)
-            print "|      Alice0     |       %f                " %(Alice0_time*1000)
-            print "|       Bob       |       %f                " %(Bob_time*1000)
-            print "|      Alice1     |       %f                " %(Alice1_time*1000)
+            print "|                M        |       %f                " %(M_time*1000)
+            print "|              Alice0     |       %f                " %(Alice0_time*1000)
+            print "|               Bob       |       %f                " %(Bob_time*1000)
+            print "|     Alice1 + While Loop |       %f                " %(Alice1_time*1000)
             print "============================================"
 
 def main():
