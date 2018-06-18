@@ -87,8 +87,8 @@ Remark: gcc-5 is the version I have installed, yours might differ."
 
 #### Linux
 
-`$ sudo apt-get install gmp`
-`$ sudo apt-get install mpfr`
+`$ sudo apt-get install libgmp3-dev`
+`$ sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg`
 `$ sudo apt install libomp-dev`
 
 ## Usage
@@ -170,6 +170,8 @@ This will print a successful message remarking that Alice and Bob share the same
 
 ## Test Results
 
+### Python
+
 If you are interested in individual parameters and the total execution time of the program there is an already available script specifically designed to find the average of all the printed output of 'simplekeyexchange.py' and this script also plots a graph of the exeuction time for 'n' points. 
 
 To make use of this test-suite first type:
@@ -190,3 +192,25 @@ If you are using a Unix based system you will need to make the shell script exec
 
 If you wish to terminate execution on Linux or Unix you can use the Ctrl+X command to terminate the script.
 
+### C
+
+The source code `jintailwe.c` comes with its own custom test-suite that can use command line tools to display results.
+
+If you run:
+
+`$ ./jintailwe`
+
+It will print the outupt:
+
+`$ Key Exchange worked, Alice and Bob share the same key
+   Type ./jintailwe -help for further instructions`
+
+The `-help` parameter will present a list of all the options available at any time to run any benchmark tests.
+
+The current test suit uses the following parameters:
+
+- `--results`: Displays both time and memory results.
+- `--time`: Displays the time taken (in ms) to run the entire key exchange
+- `--time-params`: Displays the time taken for individual parameters like **M, Alice0, Bob and Alice1** and the time taken to run the entire key exchange.
+- `--mem`: Displays the memory consumed by **M, Alice0, Bob and Alice1** and the communicational complexity of sending messages between Alice & Bob as **A->B** and **B->A**.
+- `--print-keys`: This shows a bitwise representation of Alice's and Bob's keys
