@@ -20,7 +20,7 @@
 
 #ifndef HEADER_JINTAILWE_H
 
-#define LATTICE_DIMENSION 752 // Matrix Dimension
+#define LATTICE_DIMENSION 512 // Matrix Dimension
 #define MODULO_Q 2147483647 // q - The modulo factor
 
 struct vector_params{
