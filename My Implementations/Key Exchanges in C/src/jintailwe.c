@@ -28,7 +28,7 @@
 #include "dgs.h"
 
 int main(int argc, char **argv){
-  D = dgs_disc_gauss_dp_init(LATTICE_DIMENSION,0,6,DGS_DISC_GAUSS_UNIFORM_LOGTABLE);
+  D = dgs_disc_gauss_dp_init(LATTICE_DIMENSION,0,6,DGS_DISC_GAUSS_UNIFORM_TABLE);
   /************ Allocate Temporary Memory on the Fly **************************/
   uint16_t i, j;
   //Alice Memory Allocation
