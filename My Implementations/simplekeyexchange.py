@@ -5,6 +5,7 @@
 #As defined in section 2 of the paper a robust extractor takes in input
 #an integer modulo q, a signal sigma defined in the 'signal' function and a prime number q
 
+import sys
 from random import *
 import numpy
 from numpy import *
@@ -107,18 +108,17 @@ def run_key_exchange(n,q):
     start_time = datetime.datetime.now()
     M = generate_matrix_M(n,q)
     end_time = datetime.datetime.now()
-    print_time((end_time-start_time).total_seconds(), "Generating M took ")
+    M_time = (end_time-start_time).total_seconds()
     start_time = datetime.datetime.now()
     SA = generate_gaussian_matrix(n)
     EA = generate_gaussian_matrix(n)
     edashA = generate_gaussian_vector(n)
     end_time = datetime.datetime.now()
-    print_time((end_time-start_time).total_seconds(), "Alice's parameters took ")
+    Alice0_time = (end_time-start_time).total_seconds()
     start_time = datetime.datetime.now()
     pB,sB = generate_bob_params(M,n,q)
     edashB = 2 * generate_gaussian_vector(n)
-    end_time = datetime.datetime.now()
-    print_time((end_time-start_time).total_seconds(), "Bob's parameters took ")
+
 
     #Setup variables to reduce complexity
     m_dot = numpy.transpose(M).dot(sB)
@@ -126,13 +126,9 @@ def run_key_exchange(n,q):
     sa_transpose = numpy.transpose(SA)
 
     #Generate the Keys
-    start_time = datetime.datetime.now()
-    KA = (numpy.transpose(SA).dot(pB) + 2*edashA)%q
     KB = ((sa_transpose.dot(m_dot) + (ea_transpose.dot(sB))) + edashB) % q
-    end_time = datetime.datetime.now()
-    print_time((end_time-start_time).total_seconds(), "KA and KB took ")
+    KA = (numpy.transpose(SA).dot(pB) + 2*edashA)%q
     #---------ensuring Robust extractor property is preserved--------
-    start_time = datetime.datetime.now()
 
     i = 0 #INDEX REQUIRED FOR INCREMENTAL ROBUST EXTRACTOR
     #Keep on generating the parameters until robust extractor condition 3 is preserved
@@ -152,31 +148,64 @@ def run_key_exchange(n,q):
 
         else:
             i += 1
-    end_time = datetime.datetime.now()
-    print_time((end_time - start_time).total_seconds(), "This while loop took ")
+
     signal = generate_signal(n, KB, q)
+    end_time = datetime.datetime.now()
+    Bob_time = (end_time-start_time).total_seconds()
+    start_time = datetime.datetime.now()
     #---------------Generating shared keys------
     SKA = []
     SKB = []
     for i in range(0, n):
         SKA.append(robust_extractor(KA[i],signal[i],q))
         SKB.append(robust_extractor(KB[i],signal[i],q))
-
+    end_time = datetime.datetime.now()
+    Alice1_time = (end_time-start_time).total_seconds()
     #-----------------Results-------------------
     if SKA == SKB:
         print("Alice and Bob share the same key!")
 
     #Comment this part underneath to get the correct results data from graphresults.py
-    """
-    SKA = ''.join(map(str, SKA))
-    SKB = ''.join(map(str, SKB))
-    SKA = int(SKA)
-    SKB = int(SKB)
-    print("Alices Shared Key is:")
-    print format(SKA, 'x')
-    print("Bobs Shared Key is:")
-    print format(SKB, 'x')
-    """
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--print-keys" or sys.argv[1] == "--results":
+            if len(sys.argv) > 2:
+                if sys.argv[2] == "bin":
+                    SKA = ''.join(map(str, SKA))
+                    SKB = ''.join(map(str, SKB))
+                    SKA = int(SKA)
+                    SKB = int(SKB)
+                    print("Alice's Key is")
+                    print(SKA)
+                    print("Bobs' Key is")
+                    print(SKB)
+                elif sys.argv[2] == "hex":
+                    SKA = ''.join(map(str, SKA))
+                    SKB = ''.join(map(str, SKB))
+                    SKA = int(SKA)
+                    SKB = int(SKB)
+                    print("Alices Shared Key is:")
+                    print format(SKA, 'x')
+                    print("Bobs Shared Key is:")
+                    print format(SKB, 'x')
+            else:
+                SKA = ''.join(map(str, SKA))
+                SKB = ''.join(map(str, SKB))
+                SKA = int(SKA)
+                SKB = int(SKB)
+                print("Alice's Key is")
+                print(SKA)
+                print("Bobs' Key is")
+                print(SKB)
+        if sys.argv[1] == "--results" or sys.argv[1] == "--time":
+            print "==============TIME RESULTS=================="
+            print "============================================"
+            print "|     Parameter   |      Time(ms)           "
+            print "============================================"
+            print "|        M        |       %f                " %(M_time*1000)
+            print "|      Alice0     |       %f                " %(Alice0_time*1000)
+            print "|       Bob       |       %f                " %(Bob_time*1000)
+            print "|      Alice1     |       %f                " %(Alice1_time*1000)
+            print "============================================"
 
 def main():
 
@@ -186,7 +215,22 @@ def main():
     start_time = datetime.datetime.now()
     run_key_exchange(n,q)
     end_time = datetime.datetime.now()
-    print_time((end_time - start_time).total_seconds(), "This program took ")
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--time" or sys.argv[1] == "--results":
+            print_time((end_time - start_time).total_seconds(), "This program took ")
+        if sys.argv[1] == "--help":
+            print("Welcome to the Python Version of Jintai et al.'s LWE Post-Quantum Key Exchange")
+            print("")
+            print("--results: Display time results for each parameter and Key Exchange and print keys in binary format")
+            print("")
+            print("--time: Display time results for each parameter and Key Exchange")
+            print("")
+            print("--print-keys [options]: prints Alice's and Bob's keys")
+            print("OPTIONS:")
+            print("bin:             print a binary format for the keys")
+            print("hex:             print a hexadecimal format for the keys")
+    if len(sys.argv) < 2:
+        print("Type --help for further instructions")
 
 #initialisation
 if __name__ == "__main__":

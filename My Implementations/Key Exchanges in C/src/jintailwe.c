@@ -22,7 +22,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <omp.h>
 
 #include "jintailwe.h"
 #include "dgs.h"
