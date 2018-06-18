@@ -50,7 +50,7 @@ The C language requires multiple dependencies for the Discrete Gaussian library 
 
 - [Gmp](https://gmplib.org/)
 - [Mpfr](https://www.mpfr.org/)
-- [OpenMP](https://www.openmp.org/)
+- [OpenMP](https://www.openmp.org/) (This dependency may be defunct)
 
 #### Mac OS X
 
@@ -178,12 +178,6 @@ To make use of this test-suite first type:
 
 `$ ./runsimplekexntimes.sh 100 > simplekexresults.txt` (if you want 100 results)
 
-Then simply type:
-
-`$ python graphresults.py`
-
-Instead of running the key exchange once there is a shell script included to run the key exchange 'n' times. It can be used as:
-
 `$ ./runsimplekexntimes n` <----- Here n specifies the number of times the key exchange runs before the program terminates.
 
 If you are using a Unix based system you will need to make the shell script executable before running the above command, this can be achieved by:
@@ -191,6 +185,14 @@ If you are using a Unix based system you will need to make the shell script exec
 `$ chmod u+x runsimplekexntimes`
 
 If you wish to terminate execution on Linux or Unix you can use the Ctrl+X command to terminate the script.
+
+The Python script now comes loaded with a test-suite similar to the test script in C. 
+
+To understand the commands of the test script type:
+
+`$ python simplekeyexchange.py --help`
+
+This will display further commands that could time individual parameters, the entire key exchange and even print keys. 
 
 ### C
 
